@@ -2,6 +2,8 @@
 
 刷题总结，刷题顺序参考自[从0开始刷Leetcode](https://leetcode-cn.com/circle/article/48kq9d)
 
+刷题顺序[GithubPage版](https://cinzyae.github.io/Leetcode-Daily/)
+
 刷题顺序[本地精简版](./leetcode.html)
 
 ## 个人经验
