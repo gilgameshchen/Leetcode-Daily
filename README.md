@@ -4,8 +4,6 @@
 
 刷题顺序[GithubPage版](https://cinzyae.github.io/Leetcode-Daily/)
 
-刷题顺序[本地精简版](./leetcode.html)
-
 ## 个人经验
 
 Leetcode有模拟面试按钮，可以设定时间，模拟面试场景。~以求头脑清醒~
