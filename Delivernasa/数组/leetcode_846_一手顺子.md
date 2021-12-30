@@ -1,0 +1,101 @@
+# leetcode 846   [一手顺子](https://leetcode-cn.com/problems/hand-of-straights/)
+
+## 题目
+
+Alice 手中有一把牌，她想要重新排列这些牌，分成若干组，使每一组的牌数都是 groupSize ，并且由 groupSize 张连续的牌组成。
+
+给你一个整数数组 hand 其中 hand[i] 是写在第 i 张牌，和一个整数 groupSize 。如果她可能重新排列这些牌，返回 true ；否则，返回 false 。
+
+## 思路
+
+由于给的牌是无序的，所以首先需要先排序，这里使用官方库中的sort函数即可。
+
+然后建立这样的数据结构：
+
+```c++
+struct elemment {
+    int expect;    // 表示当前小组的下一个值
+    int num;       // 表示当前小组的元素个数
+} elem;
+```
+
+为每一个小组保存一个这样的数据结构，在遍历到一个新元素a的时候开始判断：
+
+* 如果当前没有新的小组，那么就为该元素新建一个小组，设置初始值
+* 对当前指向的未完成的小组p进行判断：
+  * 如果a = expect，更新当前小组的值，此时若到达groupSize，说明当前小组组成完毕，进入下一个小组的组成，即移动指针为p+1
+  * 如果a > expect，由于是按序存储，因此如果a不满足当前小组的需求，a之后的元素也必然不满足，因此说明组合失败，返回false
+  * 如果a < expect，说明a必然是属于之后的小组，具体是哪一个小组进行后续判断，找到合适位置插入
+
+最后判断p时候已经指向所有小组的末尾，如果是，说明所有的元素都得到合适的位置插入，返回true；反之返回false。
+
+注意两种特殊情况，加快判断：
+
+1. groupSize = 1，返回true
+2. n % groupSize != 0，返回false
+
+## 代码
+
+```c++
+class Solution {
+public:
+    bool isNStraightHand(vector<int>& hand, int groupSize) {
+        int n = hand.size();
+        if (n % groupSize != 0) {
+            return false;
+        }
+        if (groupSize == 1) {
+            return true;
+        }
+        sort(hand.begin(), hand.end());
+        vector<elemment> L;
+        int p = 0;
+
+        for (int i = 0; i < n; i++) {
+            // 如果是等于expect的话，计数
+            // 如果不是，判断是否大于expect，如果是的话说明当前不可能满足；如果小的话说明可以新建一个小组放置
+            if (p == L.size()) {
+                elem.expect = hand[i] + 1;
+                elem.num = 1; 
+                L.push_back(elem);
+            } else {
+                if (hand[i] == L[p].expect) {
+                    L[p].num++;
+                    if (L[p].num == groupSize) {
+                        p++;
+                    } else {
+                        L[p].expect++;
+                    }
+                } else if (hand[i] < L[p].expect) {
+                    int tmp_p = p + 1;
+                    // 加入到后面的小组中
+                    while (tmp_p < L.size()) {
+                        if (hand[i] == L[tmp_p].expect) {
+                            L[tmp_p].num++;
+                            L[tmp_p].expect++;
+                            break;
+                        }
+                        tmp_p++;
+                    }
+                    // 如果没有符合条件的小组，
+                    if (tmp_p == L.size()) {
+                        elem.expect = hand[i] + 1;
+                        elem.num = 1;
+                        L.push_back(elem);
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+        if (p == L.size()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+};
+```
+
+
+

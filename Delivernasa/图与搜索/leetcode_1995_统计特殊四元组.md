@@ -1,4 +1,4 @@
-# leetcode 1995   统计特殊四元组
+# leetcode 1995   [统计特殊四元组](https://leetcode-cn.com/problems/count-special-quadruplets/)
 
 ## 题目
 
