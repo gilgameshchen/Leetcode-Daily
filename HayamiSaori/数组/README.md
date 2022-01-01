@@ -269,7 +269,7 @@ public:
 };
 ```
 
-#### [41. 缺失的第一个正数](https://leetcode-cn.com/problems/first-missing-positive/)
+#### [41. 缺失的第一个正数(*)](https://leetcode-cn.com/problems/first-missing-positive/)
 
 法一，先排序再寻找最小未出现的正数，但复杂度为$O(nlogn)$，不符合要求；
 
@@ -326,6 +326,144 @@ public:
             }
         }
         return n + 1;
+    }
+};
+```
+
+#### [274. H 指数(*)](https://leetcode-cn.com/problems/h-index/)
+
+先排序，如果当前H 指数为 `h` 并且在遍历过程中找到当前值 `citations[i]>h`，则说明我们找到了一篇被引用了至少 `h+1` 次的论文，所以将现有的 `h` 值加 1。继续遍历直到 `h` 无法继续增大。最后返回 `h` 作为最终答案
+
+```C++
+class Solution {
+public:
+    int hIndex(vector<int>& citations) {
+        sort(citations.begin(), citations.end());
+        int h = 0, i = citations.size() - 1;
+        while (i >= 0 && citations[i] > h) {
+            h++;
+            i--;
+        }
+        return h;
+    }
+};
+```
+
+#### [453. 最小操作次数使数组元素相等](https://leetcode-cn.com/problems/minimum-moves-to-equal-array-elements/)
+
+除了自己外其它所有元素加一，等价于自己减一，因此，需要计算数组所有元素需要进行多少次操作能与最小元素相等。
+
+```C++
+class Solution {
+public:
+    int minMoves(vector<int>& nums) {
+        int i=0, min=nums[0];
+        int lenth = nums.size();
+        int result = 0;
+        for(i=0; i<lenth; i++)
+        {
+            if(min > nums[i])
+                min = nums[i];
+        }
+        for(i=0; i<lenth; i++)
+        {
+            result += nums[i] - min;
+        }
+        return result;
+    }
+};
+```
+
+#### [665. 非递减数列(*)](https://leetcode-cn.com/problems/non-decreasing-array/)
+
+相当于计算给定数组的逆序数
+
+```C++
+class Solution {
+public:
+    bool checkPossibility(vector<int>& nums) {
+        int count = 0;
+        int lenth = nums.size();
+        for (int i = 1; i < lenth; i++) {
+            if (nums[i] < nums[i - 1]) 
+            {
+                if (i == 1 || nums[i] >= nums[i - 2]) 
+                {
+                    nums[i - 1] = nums[i];
+                } 
+                else
+                {
+                    nums[i] = nums[i - 1];
+                }
+                count ++;
+            }
+        }
+        return count>1?false:true;
+    }
+};
+```
+
+#### [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
+
+设置一个步长`step`记录零的数目，如果步长不为0（即存在零元素）则将之后的非零元素与前`step`个交换即可
+
+```C++
+class Solution {
+public:
+    void moveZeroes(vector<int>& nums) {
+        int step = 0;
+        int lenth = nums.size();
+        for(int i=0; i<lenth; i++)
+        {
+            if(nums[i] == 0)
+                step++;
+            else if(step == 0)
+                continue;
+            else
+                swap(nums[i], nums[i - step]);
+        }
+    }
+};
+```
+
+#### [118. 杨辉三角](https://leetcode-cn.com/problems/pascals-triangle/)
+
+除了第一个和最后一个元素，三角中的元素等于它正上方和左上方两数之和（左对齐）
+
+```C++
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        vector<vector<int>> result(numRows);
+        for(int i=0; i<numRows; i++)
+        {
+            result[i].resize(i+1);
+            result[i][0] = 1;
+            result[i][i] = 1;
+            for(int j=1; j<i; j++)
+            {
+                result[i][j] = result[i-1][j] + result[i-1][j-1];
+            }
+        }
+        return result;
+    }
+};
+```
+
+#### [119. 杨辉三角 II(*)](https://leetcode-cn.com/problems/pascals-triangle-ii/)
+
+利用递推公式
+
+```C++
+class Solution {
+public:
+    vector<int> getRow(int rowIndex) {
+        vector<int> row(rowIndex + 1);
+        row[0] = 1;
+        for (int i = 1; i <= rowIndex; ++i) {
+            row[i] = (long long)1 * row[i - 1] * (rowIndex - i + 1) / i;
+        }
+        return row;
     }
 };
 ```
