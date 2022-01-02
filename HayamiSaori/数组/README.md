@@ -468,3 +468,159 @@ public:
 };
 ```
 
+#### [661. 图片平滑器](https://leetcode-cn.com/problems/image-smoother/)
+
+```python
+class Solution(object):
+    def imageSmoother(self, M):
+        R, C = len(M), len(M[0])
+        ans = [[0] * C for _ in M]
+
+        for r in xrange(R):
+            for c in xrange(C):
+                count = 0
+                for nr in (r-1, r, r+1):
+                    for nc in (c-1, c, c+1):
+                        if 0 <= nr < R and 0 <= nc < C:
+                            ans[r][c] += M[nr][nc]
+                            count += 1
+                ans[r][c] /= count
+
+        return ans
+```
+
+#### [598. 范围求和 II](https://leetcode-cn.com/problems/range-addition-ii/)
+
+等价于寻找所有操作覆盖的最小行和最小列
+
+```C++
+class Solution {
+public:
+    int maxCount(int m, int n, vector<vector<int>>& ops) {
+        int opnum = ops.size();
+        if(opnum == 0)
+            return m * n;
+        int min_m=40001, min_n=40001;
+        for(int i=0; i<opnum; i++)
+        {
+            min_m = (ops[i][0] < min_m) ? ops[i][0] : min_m;
+            min_n = (ops[i][1] < min_n) ? ops[i][1] : min_n;
+        }
+        return min_m * min_n;
+    }
+};
+```
+
+#### [419. 甲板上的战舰](https://leetcode-cn.com/problems/battleships-in-a-board/)
+
+事实上，一条战舰的数量等于甲板上所有左边和上方都不是`X`的`X`格子的数量。
+
+```C++
+class Solution {
+public:
+    int countBattleships(vector<vector<char>>& board) {
+        int i=0, j=0, result=0;
+        int x=board.size(), y=board[0].size();
+        bool up=false, left=true;
+        for(i=0; i<x; i++)
+        {
+            for(j=0; j<y; j++)
+            {
+                up = false;
+                left = false;
+                if(board[i][j] == 'X')
+                {
+                    if(i==0 || (i>0 && board[i-1][j]=='.'))
+                        up = true;
+                    if(j==0 || (j>0 && board[i][j-1]=='.'))
+                        left = true;
+                }
+                result = (up && left) ? result+1 : result;
+            }
+        }
+        return result;
+    }
+};
+```
+
+#### [189. 轮转数组](https://leetcode-cn.com/problems/rotate-array/)
+
+要对序列$p_1p_2...p_n$循环右移$k$次，等价于将序列的右边$k$子序列和左边$n-k$子序列分别逆转，然后对整个序列再进行一次逆转。即
+
+$p_1p_2...p_{n-k}\to p_{n-k}...p_2p_1$
+
+$p_{n-k+1}...p_n\to p_n...p_{n-k+1}$
+
+$p_{n-k}...p_2p_1p_n...p_{n-k+1}\to p_{n-k+1}...p_np_1p_2...p{n-k}$
+
+```C
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        int lenth = nums.size();
+        int mid = k % lenth;
+        if(mid==0)return;
+        int low=0, high=lenth-mid-1;
+        while(low<high)
+        {
+            swap(nums[low], nums[high]);
+            low++;high--;
+        }
+        low = lenth - mid;
+        high = lenth - 1;
+        while(low<high)
+        {
+            swap(nums[low], nums[high]);
+            low++;high--;
+        }
+        low = 0;
+        high = lenth - 1;
+        while(low<high)
+        {
+            swap(nums[low], nums[high]);
+            low++;high--;
+        }    
+    }
+};
+```
+
+#### [396. 旋转函数](https://leetcode-cn.com/problems/rotate-function/)
+
+以`[4, 3, 2, 6]`为例，列出每轮运算的系数如下
+
+|  4   |  3   |  2   |  6   |
+| :--: | :--: | :--: | :--: |
+|  0   |  1   |  2   |  3   |
+|  1   |  2   |  3   |  0   |
+|  2   |  3   |  0   |  1   |
+|  3   |  0   |  1   |  2   |
+
+由图可知，每一轮运算都等于上一轮结果加上数列之和，再减去系数为0的元素的`n`倍（`n`为数组长度）。即$F(i)=F(i-1)+\Sigma x_i - nx_{zero}$。而每一轮运算过后，系数为零的位置往左移动一位。
+
+```C++
+class Solution {
+public:
+    int maxRotateFunction(vector<int>& nums) {
+        int lenth = nums.size();
+        int i=0, max=0, sum=0;
+        for(i=0; i<lenth; i++)
+        {
+            max += i * nums[i];
+            sum += nums[i];
+        }
+        int zero_pos = lenth - 1;
+        int temp = max;
+        for(i=1; i<lenth; i++)
+        {
+            temp = temp + sum - lenth * nums[zero_pos];
+            if(temp > max)
+                max = temp;
+            zero_pos--;
+        }
+        return max;
+    }
+};
+```
+
+
+
