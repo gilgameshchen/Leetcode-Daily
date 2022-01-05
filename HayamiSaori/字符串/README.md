@@ -414,3 +414,166 @@ public:
 };
 ```
 
+#### [49. 字母异位词分组(*)](https://leetcode-cn.com/problems/group-anagrams/)
+
+哈希
+
+```C++
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        // 自定义对 array<int, 26> 类型的哈希函数
+        auto arrayHash = [fn = hash<int>{}] (const array<int, 26>& arr) -> size_t {
+            return accumulate(arr.begin(), arr.end(), 0u, [&](size_t acc, int num) {
+                return (acc << 1) ^ fn(num);
+            });
+        };
+
+        unordered_map<array<int, 26>, vector<string>, decltype(arrayHash)> mp(0, arrayHash);
+        for (string& str: strs) {
+            array<int, 26> counts{};
+            int length = str.length();
+            for (int i = 0; i < length; ++i) {
+                counts[str[i] - 'a'] ++;
+            }
+            mp[counts].emplace_back(str);
+        }
+        vector<vector<string>> ans;
+        for (auto it = mp.begin(); it != mp.end(); ++it) {
+            ans.emplace_back(it->second);
+        }
+        return ans;
+    }
+};
+```
+
+#### [451. 根据字符出现频率排序](https://leetcode-cn.com/problems/sort-characters-by-frequency/)
+
+设置字典计数
+
+```python
+class Solution:
+    def frequencySort(self, s: str) -> str:
+        dict = {}
+        for i in s:
+            if(i in dict):
+                dict[i] = dict[i] + 1
+            else:
+                dict[i] = 1
+        dict_order = sorted(dict.items(), key=lambda x:x[1], reverse=True)
+        result = ""
+        for d in dict_order:
+            result += d[0] * d[1]
+        return result
+```
+
+#### [423. 从英文中重建数字(*)](https://leetcode-cn.com/problems/reconstruct-original-digits-from-english/)
+
+必须将拥有唯一字母的数字排在前面筛选，否则会出现错误
+
+```C++
+class Solution {
+public:
+    string originalDigits(string s) {
+        unordered_map<char, int> c;
+        for (char ch: s) {
+            ++c[ch];
+        }
+        vector<int> cnt(10);
+        cnt[0] = c['z'];
+        cnt[2] = c['w'];
+        cnt[4] = c['u'];
+        cnt[6] = c['x'];
+        cnt[8] = c['g'];
+        
+        cnt[3] = c['h'] - cnt[8];
+        cnt[5] = c['f'] - cnt[4];
+        cnt[7] = c['s'] - cnt[6];
+
+        cnt[1] = c['o'] - cnt[0] - cnt[2] - cnt[4];
+
+        cnt[9] = c['i'] - cnt[5] - cnt[6] - cnt[8];
+
+        string ans;
+        for (int i = 0; i < 10; ++i) {
+            for (int j = 0; j < cnt[i]; ++j) {
+                ans += char(i + '0');
+            }
+        }
+        return ans;
+    }
+};
+```
+
+#### [657. 机器人能否返回原点](https://leetcode-cn.com/problems/robot-return-to-origin/)
+
+判断上与下、左与右的步数是否相等即可
+
+```C++
+class Solution {
+public:
+    bool judgeCircle(string moves) {
+        int UD=0, LR=0;
+        for(auto move:moves)
+        {
+            switch(move)
+            {
+                case 'U':
+                    UD++;
+                    break;
+                case 'D':
+                    UD--;
+                    break;
+                case 'L':
+                    LR++;
+                    break;
+                case 'R':
+                    LR--;
+                    break;
+                default:
+                    break;
+            }
+        }
+        if(UD==0 && LR==0)
+            return true;
+        else
+            return false;
+    }
+};
+```
+
+#### [551. 学生出勤记录 I](https://leetcode-cn.com/problems/student-attendance-record-i/)
+
+遍历字符串即可，注意判断条件
+
+```C++
+class Solution {
+public:
+    bool checkRecord(string s) {
+        bool A_count = false;
+        char L_count = 0;
+        for(auto x:s)
+        {
+            if(x =='A')
+            {
+                if(A_count)
+                    return false;
+                else
+                    A_count = true;
+                L_count = 0;
+            }
+            else if(x == 'L')
+            {
+                if(L_count == 2)
+                    return false;
+                else
+                    L_count++;
+            }
+            else
+                L_count = 0;
+        }
+        return true;
+    }
+};
+```
+
