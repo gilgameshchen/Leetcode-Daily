@@ -27,6 +27,52 @@ F(3) = (0 * 3) + (1 * 2) + (2 * 6) + (3 * 4) = 0 + 2 + 12 + 12 = 26
 """
 
 
+from typing import List
+
+
 class Solution:
     def maxRotateFunction(self, nums: List[int]) -> int:
-        return
+        # nums2 = []
+        # length = len(nums)
+        # max = sum(nums[i] * i for i in range(length))
+        # for i in range(1, length):
+        #     nums2[:] = reversed(nums)
+        #     nums2[:i] = reversed(nums2[:i])
+        #     nums2[i:] = reversed(nums2[i:])
+        #     nums2sum = sum(nums2[i] * i for i in range(length))
+        #     if nums2sum > max:
+        #         max = nums2sum
+
+        # length = len(nums)
+        # nums2 = [i for i in range(length)]
+        # max = sum(nums[i] * nums2[i] for i in range(length))
+        # for i in range(1, length):
+        #     nums2[:] = [length - i - 1 for i in range(length)]
+        #     nums2[:i] = reversed(nums2[:i])
+        #     nums2[i:] = reversed(nums2[i:])
+        #     nums2sum = sum(nums[i] * nums2[i] for i in range(length))
+        #     if nums2sum > max:
+        #         max = nums2sum
+        # return max
+
+        # length = len(nums)
+        # max = sum(nums[j] * j for j in range(length))
+        # for i in range(1, length):
+        #     numssum = sum(nums[j] * ((j + i)%length) for j in range(length))
+        #     if numssum > max:
+        #         max = numssum
+        # return max
+
+        length = len(nums)
+        step = sum(nums[j] for j in range(length))
+        numssum = sum(nums[j] * j for j in range(length))
+        max = numssum
+        for i in range(length):
+            numssum = numssum + step - length * nums[length - i - 1]
+            if numssum > max:
+                max = numssum
+        return max
+
+
+S = Solution()
+print(S.maxRotateFunction(list1))
