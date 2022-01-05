@@ -56,5 +56,9 @@ git push -u origin master
 
 ![pull requset](http://tva1.sinaimg.cn/large/0085EwgIgy1gxu0ieyavmj30cj06dmyd.jpg)
 
-点击open pull request，填写你的pr信息，等待鹏神同意合并即可。
+
+
+点击open pull request，填写你的pr信息，等待鹏神同意合并即可 : )
+
+
 
