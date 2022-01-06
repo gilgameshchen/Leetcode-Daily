@@ -41,8 +41,32 @@
 """
 
 
+from typing import List
+
+
 class Solution:
     def rotate(self, nums: List[int], k: int) -> None:
         """
         Do not return anything, modify nums in-place instead.
         """
+        lennums = len(nums)
+
+        # 1
+        # for i in range(k):
+        # nums[:] = nums[lennums - 1 :] + nums[: lennums - 1]
+        
+        # 2
+        # k = k % lennums
+        # nums[:] = nums[lennums - k :] + nums[: lennums - k]
+
+        # 3
+        k %= lennums
+        nums[:] = nums[::-1]
+        nums[:k] = nums[:k][::-1]
+        nums[k:] = nums[k:][::-1]
+
+
+list1 = [1, 2, 3, 4, 5, 6, 7]
+S = Solution()
+S.rotate(list1, 3)
+print(list1)
