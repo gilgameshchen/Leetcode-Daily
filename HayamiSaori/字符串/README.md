@@ -544,7 +544,28 @@ public:
 
 #### [551. 学生出勤记录 I](https://leetcode-cn.com/problems/student-attendance-record-i/)
 
-遍历字符串即可，注意判断条件
+遍历字符串即可，注意判断条件class Solution {
+public:
+    int countBinarySubstrings(string s) {
+        int ptr = 0, n = s.size(), last = 0, ans = 0;
+        while (ptr < n) {
+            char c = s[ptr];
+            int count = 0;
+            while (ptr < n && s[ptr] == c) {
+                ++ptr;
+                ++count;
+            }
+            ans += min(count, last);
+            last = count;
+        }
+        return ans;
+    }
+};
+
+作者：LeetCode-Solution
+链接：https://leetcode-cn.com/problems/count-binary-substrings/solution/ji-shu-er-jin-zhi-zi-chuan-by-leetcode-solution/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 ```C++
 class Solution {
@@ -573,6 +594,30 @@ public:
                 L_count = 0;
         }
         return true;
+    }
+};
+```
+
+#### [696. 计数二进制子串(*)](https://leetcode-cn.com/problems/count-binary-substrings/)
+
+记录每一段连续0和连续1的个数，比较相邻`count`，将较小的数加入到结果中
+
+```C++
+class Solution {
+public:
+    int countBinarySubstrings(string s) {
+        int ptr = 0, n = s.size(), last = 0, ans = 0;
+        while (ptr < n) {
+            char c = s[ptr];
+            int count = 0;
+            while (ptr < n && s[ptr] == c) {
+                ++ptr;
+                ++count;
+            }
+            ans += min(count, last);
+            last = count;
+        }
+        return ans;
     }
 };
 ```
