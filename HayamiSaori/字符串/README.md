@@ -622,3 +622,170 @@ public:
 };
 ```
 
+#### [467. 环绕字符串中唯一的子字符串(*)](https://leetcode-cn.com/problems/unique-substrings-in-wraparound-string/)
+
+记录以每个字符串结尾的子串个数
+
+```C++
+class Solution {
+public:
+    int findSubstringInWraproundString(string p) {
+        int i=0;
+        int n=p.size();
+        int ans=0;
+        vector<int>chars(26,0);
+        int len=1;
+        chars[p[0]-'a']=1;
+        for(int i=1;i<n;i++){
+            if(p[i-1]+1==p[i]||p[i-1]=='z'&&p[i]=='a')len++;
+            else len=1;
+            chars[p[i]-'a']=max(chars[p[i]-'a'],len);
+        }
+        return accumulate(chars.begin(),chars.end(),0);
+    }
+};
+```
+
+#### [535. TinyURL 的加密与解密(*)](https://leetcode-cn.com/problems/encode-and-decode-tinyurl/)
+
+```java
+public class Codec {
+    String alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    HashMap<String, String> map = new HashMap<>();
+    Random rand = new Random();
+    String key = getRand();
+
+    public String getRand() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            sb.append(alphabet.charAt(rand.nextInt(62)));
+        }
+        return sb.toString();
+    }
+
+    public String encode(String longUrl) {
+        while (map.containsKey(key)) {
+            key = getRand();
+        }
+        map.put(key, longUrl);
+        return "http://tinyurl.com/" + key;
+    }
+
+    public String decode(String shortUrl) {
+        return map.get(shortUrl.replace("http://tinyurl.com/", ""));
+    }
+}
+```
+
+#### [299. 猜数字游戏](https://leetcode-cn.com/problems/bulls-and-cows/)
+
+满足`secret[i] == guess[i]`的个数即为公牛个数；其余的进行计数，然后逐个字母进行比较，将出现次数较小的加入到奶牛中（若一个出现另一个没有出现，则加0）
+
+```python
+class Solution:
+    def getHint(self, secret: str, guess: str) -> str:
+        result = ""
+        lsecret = list(secret)
+        lguess = list(guess)
+        secret_dict = {}
+        guess_dict = {}
+        lenth = len(secret)
+        bull = 0
+        cow = 0
+        for i in range(lenth):
+            if(lsecret[i] == lguess[i]):
+                bull += 1
+                lsecret[i] = 'x'
+                lguess[i] = 'x'
+        result += str(bull) + 'A'
+        for i in range(lenth):
+            if(lsecret[i] == 'x'):
+                continue
+            else:
+                if lsecret[i] in secret_dict:
+                    secret_dict[lsecret[i]] += 1
+                else:
+                    secret_dict[lsecret[i]] = 1
+                if lguess[i] in guess_dict:
+                    guess_dict[lguess[i]] += 1
+                else:
+                    guess_dict[lguess[i]] = 1
+        for k in guess_dict.keys():
+            if k in secret_dict:
+                cow += min(guess_dict[k], secret_dict[k])
+        result += str(cow) + 'B'
+        return result
+```
+
+#### [412. Fizz Buzz](https://leetcode-cn.com/problems/fizz-buzz/)
+
+```python
+class Solution:
+    def fizzBuzz(self, n: int) -> List[str]:
+        temp = ""
+        result = []
+        for i in range(1, n+1):
+            temp = ""
+            if(i % 3 == 0):
+                temp += "Fizz"
+            if(i % 5 == 0):
+                temp += "Buzz"
+            if(len(temp) == 0):
+                temp = str(i)
+            result.append(temp)
+        return result
+```
+
+#### [506. 相对名次](https://leetcode-cn.com/problems/relative-ranks/)
+
+先设置一个字典，保存每个数字原本的位置；然后将数组排序，前三名使用特殊字符串（金银铜牌），之后的名次查询字典即可
+
+```python
+class Solution:
+    def findRelativeRanks(self, score: List[int]) -> List[str]:
+        lenth = len(score)
+        result = [""] * lenth
+        pos_dict = {}
+        for i in range(lenth):
+            pos_dict[score[i]] = i
+        score.sort(reverse=True)
+
+        result[pos_dict[score[0]]] = "Gold Medal"
+        if(lenth < 2):
+            return result
+
+        result[pos_dict[score[1]]] = "Silver Medal"
+        if(lenth < 3):
+            return result
+
+        result[pos_dict[score[2]]] = "Bronze Medal"
+        
+        for i in range(3, lenth):
+            result[pos_dict[score[i]]] = str(i+1)
+        return result
+```
+
+#### [539. 最小时间差](https://leetcode-cn.com/problems/minimum-time-difference/)
+
+先将每个字符串表示的时间按照分钟数计算，然后将新数组排序，计算相邻时间差和头尾时间差，取最小值
+
+```python
+class Solution:
+    def findMinDifference(self, timePoints: List[str]) -> int:
+        if(len(timePoints) > 1440):
+            return 0
+        minutes = []
+        for s in timePoints:
+            [hour, minute] = s.split(":")
+            minutes.append(int(hour) * 60 + int(minute))
+        minutes.sort()
+        lenth = len(minutes)
+        temp = 3601
+        for i in range(lenth - 1):
+            if temp > minutes[i+1] - minutes[i]:
+                temp = minutes[i+1] - minutes[i]
+        if temp > minutes[0] + 1440 - minutes[lenth - 1]:
+            temp = minutes[0] + 1440 - minutes[lenth - 1]
+        return temp
+```
+
