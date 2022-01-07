@@ -29,6 +29,29 @@
 """
 
 
+from typing import List
+
+
 class Solution:
     def findDiagonalOrder(self, mat: List[List[int]]) -> List[int]:
-        return
+        m = len(mat)
+        n = len(mat[0])
+        outlist = []
+        direction = False
+        maxmn = m + n - 1
+        for sum in range(maxmn):
+            if direction:
+                for i in range(sum + 1):
+                    if (i < m) and (sum - i < n):
+                        outlist.append(mat[i][sum - i])
+            else:
+                for i in range(sum + 1):
+                    if (sum - i < m) and (i < n):
+                        outlist.append(mat[sum - i][i])
+            direction = not direction
+        return outlist
+
+
+testlist = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+S = Solution()
+print(S.findDiagonalOrder(testlist))
