@@ -916,3 +916,299 @@ class Solution:
             return "x=" + str(solve)
 ```
 
+#### [38. 外观数列](https://leetcode-cn.com/problems/count-and-say/)
+
+遍历一遍数组，进行计数即可
+
+```python
+class Solution:
+    def Describe(self, s:str) -> str:
+        result = ""
+        temp = s[0]
+        count = 0
+        for i in s:
+            if i == temp:
+                count += 1
+            else:
+                result += str(count) + temp
+                temp = i
+                count = 1
+        result += str(count) + temp
+        return result
+    def countAndSay(self, n: int) -> str:
+        result = "1"
+        for i in range(n - 1):
+            result = self.Describe(result)
+        return result
+```
+
+#### [443. 压缩字符串](https://leetcode-cn.com/problems/string-compression/)
+
+与上题类似
+
+```python
+class Solution:
+    def compress(self, chars: List[str]) -> int:
+        def reverse(left: int, right: int) -> None:
+            while left < right:
+                chars[left], chars[right] = chars[right], chars[left]
+                left += 1
+                right -= 1
+
+        n = len(chars)
+        write = left = 0
+        for read in range(n):
+            if read == n - 1 or chars[read] != chars[read + 1]:
+                chars[write] = chars[read]
+                write += 1
+                num = read - left + 1
+                if num > 1:
+                    anchor = write
+                    while num > 0:
+                        chars[write] = str(num % 10)
+                        write += 1
+                        num //= 10
+                    reverse(anchor, write - 1)
+                left = read + 1
+        return write
+```
+
+#### [8. 字符串转换整数 (atoi)](https://leetcode-cn.com/problems/string-to-integer-atoi/)
+
+状态机解法
+
+```C++
+class Automaton {
+    string state = "start";
+    unordered_map<string, vector<string>> table = {
+        {"start", {"start", "signed", "in_number", "end"}},
+        {"signed", {"end", "end", "in_number", "end"}},
+        {"in_number", {"end", "end", "in_number", "end"}},
+        {"end", {"end", "end", "end", "end"}}
+    };
+
+    int get_col(char c) {
+        if (isspace(c)) return 0;
+        if (c == '+' or c == '-') return 1;
+        if (isdigit(c)) return 2;
+        return 3;
+    }
+public:
+    int sign = 1;
+    long long ans = 0;
+
+    void get(char c) {
+        state = table[state][get_col(c)];
+        if (state == "in_number") {
+            ans = ans * 10 + c - '0';
+            ans = sign == 1 ? min(ans, (long long)INT_MAX) : min(ans, -(long long)INT_MIN);
+        }
+        else if (state == "signed")
+            sign = c == '+' ? 1 : -1;
+    }
+};
+
+class Solution {
+public:
+    int myAtoi(string str) {
+        Automaton automaton;
+        for (char c : str)
+            automaton.get(c);
+        return automaton.sign * automaton.ans;
+    }
+};
+```
+
+#### [13. 罗马数字转整数](https://leetcode-cn.com/problems/roman-to-integer/)
+
+设置一个字典，按每个字母对应数字进行计算
+
+```python
+class Solution:
+
+    SYMBOL_VALUES = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000,
+    }
+
+    def romanToInt(self, s: str) -> int:
+        ans = 0
+        n = len(s)
+        for i, ch in enumerate(s):
+            value = Solution.SYMBOL_VALUES[ch]
+            if i < n - 1 and value < Solution.SYMBOL_VALUES[s[i + 1]]:
+                ans -= value
+            else:
+                ans += value
+        return ans
+```
+
+#### [12. 整数转罗马数字(*)](https://leetcode-cn.com/problems/integer-to-roman/)
+
+```C++
+class Solution {
+public:
+    string intToRoman(int num) {
+        int values[]={1000,900,500,400,100,90,50,40,10,9,5,4,1};
+        string reps[]={"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
+        
+        string res;
+        for(int i=0; i<13; i++){
+            while(num>=values[i]){
+                num -= values[i];
+                res += reps[i];
+            }
+        }
+        return res;
+    }
+};
+```
+
+#### [273. 整数转换英文表示(*)](https://leetcode-cn.com/problems/integer-to-english-words/)
+
+纯体力劳动。将其3位分组，并递归翻译
+
+```C++
+class Solution {
+public:
+    vector<string> singles = {"", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
+    vector<string> teens = {"Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+    vector<string> tens = {"", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+    vector<string> thousands = {"", "Thousand", "Million", "Billion"};
+
+    string numberToWords(int num) {
+        if (num == 0) {
+            return "Zero";
+        }
+        string sb;
+        for (int i = 3, unit = 1000000000; i >= 0; i--, unit /= 1000) {
+            int curNum = num / unit;
+            if (curNum != 0) {
+                num -= curNum * unit;
+                string curr;
+                recursion(curr, curNum);
+                curr = curr + thousands[i] + " ";
+                sb = sb + curr;
+            }
+        }
+        while (sb.back() == ' ') {
+            sb.pop_back();
+        }
+        return sb;
+    }
+
+    void recursion(string & curr, int num) {
+        if (num == 0) {
+            return;
+        } else if (num < 10) {
+            curr = curr + singles[num] + " ";
+        } else if (num < 20) {
+            curr = curr + teens[num - 10] + " ";
+        } else if (num < 100) {
+            curr = curr + tens[num / 10] + " ";
+            recursion(curr, num % 10);
+        } else {
+            curr = curr + singles[num / 100] + " Hundred ";
+            recursion(curr, num % 100);
+        }
+    }
+};
+```
+
+#### [165. 比较版本号](https://leetcode-cn.com/problems/compare-version-numbers/)
+
+以"."将版本号分割，记录数字，逐个比较即可
+
+```python
+class Solution:
+    def compareVersion(self, version1: str, version2: str) -> int:
+        temp = version1.split(".")
+        v1 = []
+        for t in temp:
+            v1.append(int(t))
+        temp = version2.split(".")
+        v2 = []
+        for t in temp:
+            v2.append(int(t))
+        lenth = min(len(v1), len(v2))
+        for i in range(lenth):
+            if(v1[i] == v2[i]):
+                continue
+            elif (v1[i] > v2[i]):
+                return 1
+            else:
+                return -1
+        if len(v1) < len(v2):
+            if sum(v2) - sum(v1) > 0:
+                return -1
+            else:
+                return 0
+        elif len(v1) == len(v2):
+            return 0
+        else:
+            if sum(v1) - sum(v2) > 0:
+                return 1
+            else:
+                return 0
+```
+
+#### [481. 神奇字符串(*)](https://leetcode-cn.com/problems/magical-string/)
+
+```C++
+class Solution {
+public:
+    int magicalString(int n) {
+        string s = "122";
+        char last = '2';
+        int ans = 1;
+        for(int i = 2; i < n; i++){
+            int curG = s[i] - '0';
+            if(last == '1'){
+                last = '2';
+            }else{
+                last = '1';
+            }
+            while(curG){
+                s += last; 
+                curG--;
+            }
+            
+            if(s[i] == '1'){
+                ++ans;
+            }
+        }
+
+        return ans;
+    }
+};
+```
+
+#### [392. 判断子序列](https://leetcode-cn.com/problems/is-subsequence/)
+
+设置两个指针分别指向`s`和`t`，遍历，当子串与模式串遍历到的位置的字符相等时，子串指针后移。
+
+```C++
+class Solution {
+public:
+    bool isSubsequence(string s, string t) {
+        int spos=0, tpos=0, slen=s.size(), tlen=t.size();
+        bool result = false;
+        while(spos<slen && tpos<tlen)
+        {
+            if(s[spos] == t[tpos])
+                spos++;
+            tpos++;
+        }
+        if(spos == slen)
+            result = true;
+
+        return result;
+    }
+};
+```
+
