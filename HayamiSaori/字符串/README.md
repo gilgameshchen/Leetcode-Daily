@@ -544,28 +544,7 @@ public:
 
 #### [551. 学生出勤记录 I](https://leetcode-cn.com/problems/student-attendance-record-i/)
 
-遍历字符串即可，注意判断条件class Solution {
-public:
-    int countBinarySubstrings(string s) {
-        int ptr = 0, n = s.size(), last = 0, ans = 0;
-        while (ptr < n) {
-            char c = s[ptr];
-            int count = 0;
-            while (ptr < n && s[ptr] == c) {
-                ++ptr;
-                ++count;
-            }
-            ans += min(count, last);
-            last = count;
-        }
-        return ans;
-    }
-};
-
-作者：LeetCode-Solution
-链接：https://leetcode-cn.com/problems/count-binary-substrings/solution/ji-shu-er-jin-zhi-zi-chuan-by-leetcode-solution/
-来源：力扣（LeetCode）
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+遍历字符串即可，注意判断条件
 
 ```C++
 class Solution {
@@ -787,5 +766,153 @@ class Solution:
         if temp > minutes[0] + 1440 - minutes[lenth - 1]:
             temp = minutes[0] + 1440 - minutes[lenth - 1]
         return temp
+```
+
+#### [553. 最优除法(*)](https://leetcode-cn.com/problems/optimal-division/)
+
+```java
+public class Solution {
+    public String optimalDivision(int[] nums) {
+        if (nums.length == 1)
+            return nums[0] + "";
+        if (nums.length == 2)
+            return nums[0] + "/" + nums[1];
+        StringBuilder res = new StringBuilder(nums[0] + "/(" + nums[1]);
+        for (int i = 2; i < nums.length; i++) {
+            res.append("/" + nums[i]);
+        }
+        res.append(")");
+        return res.toString();
+    }
+}
+```
+
+#### [537. 复数乘法](https://leetcode-cn.com/problems/complex-number-multiplication/)
+
+将复数乘法展开即可
+
+```python
+class Solution:
+    def complexNumberMultiply(self, num1: str, num2: str) -> str:
+        temp = num1.split("+")
+        a1 = int(temp[0])
+        b1 = int(temp[1][:-1])
+        
+        temp = num2.split("+")
+        a2 = int(temp[0])
+        b2 = int(temp[1][:-1])
+
+        a3 = a1 * a2 - b1 * b2
+        b3 = a1 * b2 + a2 * b1
+        result = str(a3) + "+" + str(b3) + "i"
+        return result
+```
+
+#### [592. 分数加减运算](https://leetcode-cn.com/problems/fraction-addition-and-subtraction/)
+
+基本属于体力劳动
+
+```python
+class Solution:
+    def gcd_2(self, x,y):
+        result = 1
+        if x > y:
+            smaller = y
+        else:
+            smaller = x
+        for i in range(1,smaller + 1):
+            if((x % i == 0) and (y % i == 0)):
+                result = i
+        return result
+
+    def gbs_2(self, a,b):
+        gcd = self.gcd_2(a,b)
+        gbs = a//gcd * b//gcd * gcd
+        return gbs
+
+    def gbs_list(self, nums):
+        if len(nums) == 1:
+            return nums[0]
+        a,b = nums[0],nums[1]
+        a = self.gbs_2(a,b)
+        for i in range(2,len(nums)):
+            a = self.gbs_2(a,nums[i])
+        return a
+
+    def fractionAddition(self, expression: str) -> str:
+        expression = expression.replace("-", "+-")
+        temp = expression.split("+")
+        up = []
+        down = []
+        if(temp[0] == ""):
+            temp.pop(0)
+        for t in temp:
+            [a, b] = t.split("/")
+            up.append(int(a))
+            down.append(int(b))
+        GBS = self.gbs_list(down)
+        lenth = len(up)
+        sumup = 0
+        for i in range(lenth):
+            sumup += up[i] * (GBS // down[i])
+        if(sumup == 0):
+            return "0/1"
+        GCD = self.gcd_2(abs(sumup), GBS)
+        result_up = sumup // GCD
+        result_down = GBS // GCD
+        result = ""
+        if(result_up * result_down < 0):
+            result = "-"
+        return result + str(abs(result_up)) + "/" + str(abs(result_down))
+```
+
+#### [640. 求解方程](https://leetcode-cn.com/problems/solve-the-equation/)
+
+体力劳动，以等号区分，计算出左右两边的未知数系数和，常数和，解之即可
+
+```python
+class Solution:
+    def solveEquation(self, equation: str) -> str:
+        left_x = []
+        right_x = []
+        left_normal = []
+        right_normal = []
+        equation = equation.replace("-", "+-")
+        [left_exp, right_exp] = equation.split("=")
+        temp = left_exp.split("+")
+        if(temp[0] == ""):
+            temp.pop(0)
+        for t in temp:
+            if "x" in t:
+                if t == "x":
+                    left_x.append(1)
+                elif t == "-x":
+                    left_x.append(-1)
+                else:
+                    left_x.append(int(t[:-1]))
+            else:
+                left_normal.append(int(t))
+        temp = right_exp.split("+")
+        if(temp[0] == ""):
+            temp.pop(0)
+        for t in temp:
+            if "x" in t:
+                if t == "x":
+                    right_x.append(1)
+                elif t == "-x":
+                    right_x.append(-1)
+                else:
+                    right_x.append(int(t[:-1]))
+            else:
+                right_normal.append(int(t))
+        factor_x = sum(left_x) - sum(right_x)
+        factor_normal = sum(right_normal) - sum(left_normal)
+        if(factor_x == 0 and factor_normal == 0):
+            return "Infinite solutions"
+        elif(factor_x == 0 and factor_normal !=0):
+            return "No solution"
+        else:
+            solve = factor_normal // factor_x
+            return "x=" + str(solve)
 ```
 
