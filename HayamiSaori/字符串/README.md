@@ -1212,3 +1212,309 @@ public:
 };
 ```
 
+#### [524. 通过删除字母匹配到字典里最长单词(*)](https://leetcode-cn.com/problems/longest-word-in-dictionary-through-deleting/)
+
+序列自动机
+
+![image-20220110155636379](README.assets/image-20220110155636379.png)
+
+![image-20220110155702518](README.assets/image-20220110155702518.png)
+
+```C++
+class Solution {
+public:
+    string findLongestWord(string s, vector<string>& dictionary) {
+        const int n = s.size();
+        int next[26];
+        fill_n(next, 26, -1);
+        int trans[n + 1][26];
+        fill_n(trans[n], 26, -1);
+        for (int i = n - 1;0 <= i;--i) {
+            next[s[i] - 'a'] = i + 1;
+            copy_n(next, 26, trans[i]);
+        }
+        string_view ans = "";
+        for (const auto& e : dictionary) {
+            int state = 0;
+            for (char c : e) {
+                state = trans[state][c - 'a'];
+                if (state == -1) break;
+            }
+            if (state == -1) continue;
+            if (e.size() > ans.size() || e.size() == ans.size() && e < ans)
+                ans = e;
+        }
+        return string(ans);
+    }
+};
+```
+
+#### [521. 最长特殊序列 Ⅰ(*)](https://leetcode-cn.com/problems/longest-uncommon-subsequence-i/)
+
+脑筋急转弯
+
+* 若`len(a) == len(b)`，当两个字符串相等时没有符合的特殊序列，若两个字符串不相等，则最长特殊序列为它们自己；
+* 否则，最长的为特殊序列长度
+
+```C
+int findLUSlength(char * a, char * b){
+    int alen = strlen(a);
+    int blen = strlen(b);
+    if(alen == blen)
+        return (strcmp(a,b)==0) ? -1 : alen;
+    else
+        return (alen > blen) ? alen : blen;
+}
+```
+
+#### [522. 最长特殊序列 II(*)](https://leetcode-cn.com/problems/longest-uncommon-subsequence-ii/)
+
+```java
+public class Solution {
+    public boolean isSubsequence(String x, String y) {
+        int j = 0;
+        for (int i = 0; i < y.length() && j < x.length(); i++)
+            if (x.charAt(j) == y.charAt(i))
+                j++;
+        return j == x.length();
+    }
+    public int findLUSlength(String[] strs) {
+        Arrays.sort(strs, new Comparator < String > () {
+            public int compare(String s1, String s2) {
+                return s2.length() - s1.length();
+            }
+        });
+        for (int i = 0, j; i < strs.length; i++) {
+            boolean flag = true;
+            for (j = 0; j < strs.length; j++) {
+                if (i == j)
+                    continue;
+                if (isSubsequence(strs[i], strs[j])) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (flag)
+                return strs[i].length();
+        }
+        return -1;
+    }
+}
+```
+
+#### [66. 加一](https://leetcode-cn.com/problems/plus-one/)
+
+注意进位即可，设置标志位`CF`
+
+```C++
+class Solution {
+public:
+    vector<int> plusOne(vector<int>& digits) {
+        bool CF = true;
+        int lenth = digits.size();
+        for(int i=lenth-1; i>=0; i--)
+        {
+            if(!CF)
+                break;
+            else if(digits[i] == 9)
+                digits[i] = 0;
+            else
+            {
+                digits[i]++;
+                CF = false;
+            }
+        }
+        if(CF)
+            digits.insert(digits.begin(), 1);
+        return digits;
+    }
+};
+```
+
+#### [67. 二进制求和](https://leetcode-cn.com/problems/add-binary/)
+
+同上，注意进位，先让`result`为两个字符串中较长的，然后逐位相加。注意进位标志和结果的设置
+
+```C++
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        int alen=a.size(), blen=b.size();
+        int short_lenth = min(alen, blen);
+        int long_lenth = max(alen, blen);
+        bool aflag, bflag, CF=false;
+        string result = (alen > blen) ? a : b;
+        for(int i=1; i<=short_lenth; i++)
+        {
+            aflag = (a[alen - i] == '1') ? true : false;
+            bflag = (b[blen - i] == '1') ? true : false;
+            if(CF)
+            {
+                result[long_lenth - i] = (aflag ^ bflag) ? '0' : '1';
+                CF = (aflag | bflag) ? true : false;
+            }
+            else
+            {
+                result[long_lenth - i] = (aflag ^ bflag) ? '1' : '0';
+                CF = (aflag & bflag) ? true : false;
+            }
+        }
+        if(CF)
+        {
+            for(int i=long_lenth-short_lenth-1; i>=0; i--)
+            {
+                if(!CF)
+                    break;
+                aflag = (result[i] == '1') ? true : false;
+                result[i] = (CF ^ aflag) ? '1' : '0';
+                CF = (CF & aflag) ? true : false;
+            }
+            if(CF)
+                result.insert(result.begin(), '1');
+        }
+        return result;
+    }
+};
+```
+
+#### [415. 字符串相加](https://leetcode-cn.com/problems/add-strings/)
+
+与上题类似，进位判断不同
+
+```c++
+class Solution {
+public:
+    string addStrings(string num1, string num2) {
+        int alen=num1.size(), blen=num2.size();
+        int short_lenth = min(alen, blen);
+        int long_lenth = max(alen, blen);
+        bool CF=false;
+        char anum, bnum;
+        string result = (alen > blen) ? num1 : num2;
+        for(int i=1; i<=short_lenth; i++)
+        {
+            anum = num1[alen-i] - '0';
+            bnum = num2[blen-i] - '0';
+            if(CF)
+            {
+                result[long_lenth - i] = ((anum + bnum + 1) % 10) + '0';
+                CF = ((anum + bnum + 1) > 9) ? true : false;
+            }
+            else
+            {
+                result[long_lenth - i] = ((anum + bnum) % 10) + '0';
+                CF = ((anum + bnum) > 9) ? true : false;
+            }
+        }
+        if(CF)
+        {
+            for(int i=long_lenth-short_lenth-1; i>=0; i--)
+            {
+                if(!CF)
+                    break;
+                CF = (result[i] - '0' + 1 > 9) ? true : false;
+                result[i] = (result[i] - '0' + 1) % 10 + '0';
+            }
+            if(CF)
+                result.insert(result.begin(), '1');
+        }
+        return result;
+    }
+};
+```
+
+#### [43. 字符串相乘(*)](https://leetcode-cn.com/problems/multiply-strings/)
+
+体力劳动
+
+```python
+class Solution:
+    def multiply(self, num1: str, num2: str) -> str:
+        if num1 == "0" or num2 == "0":
+            return "0"
+        
+        m, n = len(num1), len(num2)
+        ansArr = [0] * (m + n)
+        for i in range(m - 1, -1, -1):
+            x = int(num1[i])
+            for j in range(n - 1, -1, -1):
+                ansArr[i + j + 1] += x * int(num2[j])
+        
+        for i in range(m + n - 1, 0, -1):
+            ansArr[i - 1] += ansArr[i] // 10
+            ansArr[i] %= 10
+        
+        index = 1 if ansArr[0] == 0 else 0
+        ans = "".join(str(x) for x in ansArr[index:])
+        return ans
+```
+
+#### [306. 累加数(*)](https://leetcode-cn.com/problems/additive-number/)
+
+穷举法，当它的第一个数字和第二个数字以及总长度确定后，这整个累加序列也就确定了。
+
+```C++
+class Solution {
+public:
+    bool isAdditiveNumber(string num) {
+        int n = num.size();
+        for (int secondStart = 1; secondStart < n - 1; ++secondStart) {
+            if (num[0] == '0' && secondStart != 1) {
+                break;
+            }
+            for (int secondEnd = secondStart; secondEnd < n - 1; ++secondEnd) {
+                if (num[secondStart] == '0' && secondStart != secondEnd) {
+                    break;
+                }
+                if (valid(secondStart, secondEnd, num)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool valid(int secondStart, int secondEnd, string num) {
+        int n = num.size();
+        int firstStart = 0, firstEnd = secondStart - 1;
+        while (secondEnd <= n - 1) {
+            string third = stringAdd(num, firstStart, firstEnd, secondStart, secondEnd);
+            int thirdStart = secondEnd + 1;
+            int thirdEnd = secondEnd + third.size();
+            if (thirdEnd >= n || !(num.substr(thirdStart, thirdEnd - thirdStart + 1) == third)) {
+                break;
+            }
+            if (thirdEnd == n - 1) {
+                return true;
+            }
+            firstStart = secondStart;
+            firstEnd = secondEnd;
+            secondStart = thirdStart;
+            secondEnd = thirdEnd;
+        }
+        return false;
+    }
+
+    string stringAdd(string s, int firstStart, int firstEnd, int secondStart, int secondEnd) {
+        string third;
+        int carry = 0, cur = 0;
+        while (firstEnd >= firstStart || secondEnd >= secondStart || carry != 0) {
+            cur = carry;
+            if (firstEnd >= firstStart) {
+                cur += s[firstEnd] - '0';
+                --firstEnd;
+            }
+            if (secondEnd >= secondStart) {
+                cur += s[secondEnd] - '0';
+                --secondEnd;
+            }
+            carry = cur / 10;
+            cur %= 10;
+            third.push_back(cur + '0');
+        }
+        reverse(third.begin(), third.end());
+        return third;
+    }
+};
+```
+
