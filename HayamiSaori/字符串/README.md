@@ -1518,3 +1518,170 @@ public:
 };
 ```
 
+#### [482. 密钥格式化](https://leetcode-cn.com/problems/license-key-formatting/)
+
+先计数得到密钥长度，然后取余数，先处理第一个分组，之后添加其余分组，共需要遍历两轮
+
+```C++
+class Solution {
+public:
+    string licenseKeyFormatting(string s, int k) {
+        string result = "";
+        int i=0, count=0, lenth=s.size(), headlen=0;
+        while(i < lenth)
+        {
+            if(isalnum(s[i]))
+                count++;
+            i++;
+        }
+        if(count == 0) 
+            return result;
+        i = 0;
+        headlen = count % k;
+        while(result.size() < headlen)
+        {
+            if(isalnum(s[i]))
+                result.push_back(toupper(s[i]));
+            i++;
+        }
+        if(headlen != 0)
+            result += '-';
+        count = 0;
+        for(; i<lenth; i++)
+        {
+            if(isalnum(s[i]))
+            {
+                result.push_back(toupper(s[i]));
+                count++;
+                if(count % k == 0)
+                    result += '-';
+            }
+        }
+        result.pop_back();
+        return result;
+    }
+};
+```
+
+#### [6. Z 字形变换(*)](https://leetcode-cn.com/problems/zigzag-conversion/)
+
+```C++
+class Solution {
+public:
+    string convert(string s, int numRows) {
+        if (numRows == 1) 
+            return s;
+        vector<string> rows(min(numRows, int(s.size())));
+        int curRow = 0;
+        bool goingDown = false;
+        for (char c : s) 
+        {
+            rows[curRow] += c;
+            if (curRow == 0 || curRow == numRows - 1) 
+                goingDown = !goingDown;
+            curRow += goingDown ? 1 : -1;
+        }
+        string ret;
+        for (string row : rows) 
+            ret += row;
+        return ret;
+    }
+};
+```
+
+#### [68. 文本左右对齐(*)](https://leetcode-cn.com/problems/text-justification/)
+
+```python
+# blank 返回长度为 n 的由空格组成的字符串
+def blank(n: int) -> str:
+    return ' ' * n
+
+class Solution:
+    def fullJustify(self, words: List[str], maxWidth: int) -> List[str]:
+        ans = []
+        right, n = 0, len(words)
+        while True:
+            left = right  # 当前行的第一个单词在 words 的位置
+            sumLen = 0  # 统计这一行单词长度之和
+            # 循环确定当前行可以放多少单词，注意单词之间应至少有一个空格
+            while right < n and sumLen + len(words[right]) + right - left <= maxWidth:
+                sumLen += len(words[right])
+                right += 1
+
+            # 当前行是最后一行：单词左对齐，且单词之间应只有一个空格，在行末填充剩余空格
+            if right == n:
+                s = " ".join(words[left:])
+                ans.append(s + blank(maxWidth - len(s)))
+                break
+
+            numWords = right - left
+            numSpaces = maxWidth - sumLen
+
+            # 当前行只有一个单词：该单词左对齐，在行末填充空格
+            if numWords == 1:
+                ans.append(words[left] + blank(numSpaces))
+                continue
+
+            # 当前行不只一个单词
+            avgSpaces = numSpaces // (numWords - 1)
+            extraSpaces = numSpaces % (numWords - 1)
+            s1 = blank(avgSpaces + 1).join(words[left:left + extraSpaces + 1])  # 拼接额外加一个空格的单词
+            s2 = blank(avgSpaces).join(words[left + extraSpaces + 1:right])  # 拼接其余单词
+            ans.append(s1 + blank(avgSpaces) + s2)
+
+        return ans
+```
+
+#### [28. 实现 strStr()](https://leetcode-cn.com/problems/implement-strstr/)
+
+经典KMP算法
+
+```C++
+class Solution {
+public:
+    void GetNext(vector<int>& next, string t)
+    {
+        int i=1, j=0, lenth=t.size();
+        while(i < lenth)
+        {
+            if(t[i] == t[j])
+            {
+                next[i] = j + 1;
+                i++;
+                j++;
+            }
+            else if (j > 0)
+                j = next[j - 1];
+            else
+            {
+                next[i] = 0;
+                i++;
+            }
+        }
+    }
+    int strStr(string haystack, string needle) {
+        int slen=haystack.size(), tlen=needle.size();
+        if(tlen == 0)
+            return 0;
+        vector<int> next(tlen, 0);
+        GetNext(next, needle);
+        int i=0, j=0;
+        while(i < slen)
+        {
+            if(haystack[i] == needle[j])
+            {
+                i++;
+                j++;
+            }
+            else if (j > 0)
+                j = next[j - 1];
+            else
+                i++;
+            if(j == tlen)
+                return i - tlen;
+        }
+        return -1;
+    }
+};
+```
+
