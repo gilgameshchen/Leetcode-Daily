@@ -352,3 +352,263 @@ public:
 };
 ```
 
+#### [393. UTF-8 编码验证](https://leetcode-cn.com/problems/utf-8-validation/)
+
+体力劳动
+
+```C++
+class Solution {
+public:
+    bool validUtf8(vector<int>& data) {
+        int n = data.size();
+        for(auto & d : data){
+            d &= 255;
+        }
+
+        for(int i=0; i<n; ++i){
+            if(data[i] <= 127) continue;
+            if(data[i] >= 192 && data[i] < 224){
+                i++;
+                if(i>=n || data[i] < 128 || data[i] >= 192) return false;
+            }
+            else if(data[i] >= 224 && data[i] < 240){
+                i++;
+                if(i>=n || data[i] < 128 || data[i] >= 192) return false;
+                i++;
+                if(i>=n || data[i] < 128 || data[i] >= 192) return false;
+            }
+            else if(data[i] >= 240 && data[i] < 248){
+                i++;
+                if(i>=n || data[i] < 128 || data[i] >= 192) return false;
+                i++;
+                if(i>=n || data[i] < 128 || data[i] >= 192) return false;
+                i++;
+                if(i>=n || data[i] < 128 || data[i] >= 192) return false;
+            }
+            else return false;
+        }
+        return true;
+    }
+};
+```
+
+#### [172. 阶乘后的零](https://leetcode-cn.com/problems/factorial-trailing-zeroes/)
+
+对于阶乘数来说，2因子的个数一定比5因子多，因此只需要数5因子的个数即可
+
+```C++
+class Solution {
+public:
+    int trailingZeroes(int n) {
+        int result=0;
+        while(n >= 5)
+        {
+            result += n/5;
+            n /= 5;
+        }
+        return result;
+    }
+};
+```
+
+#### [458. 可怜的小猪(*)](https://leetcode-cn.com/problems/poor-pigs/)
+
+该问题不关心具体方案。
+
+其实香农已经在《信息论》（[信息熵](https://baike.baidu.com/item/香农熵/1649961)）中给过我们结论了——我们一共可以进行n轮实验：$n=\frac{minutesToTest}{minutesToDie}$
+
+- 经过所有实验，一只小猪能有多少种状态？第一轮就死、第二轮死、...、第n轮死，以及生还，所以一共有n + 1种状态
+- n + 1种状态所携带的信息为log_2(n + 1)比特，这也是一只小猪最多提供的信息量
+- 而”$buckets$瓶液体中哪一瓶是毒“这件事，也有$buckets$种可能性，所以需要的信息量是$log_2(buckets)$
+
+注：以上所有事件、状态都是先验等概的，所以可以直接对2取对数得到信息熵
+
+因此一定存在一种“合理设计”的实验，使得我们只要有k只猪猪：满足 $k \times log_2(n + 1) \ge log_2(buckets)$时，则我们一定能得到足够的信息量去判断哪一瓶是毒。
+
+```C++
+class Solution {
+public:
+    int poorPigs(int buckets, int minutesToDie, int minutesToTest) {
+        int states = minutesToTest / minutesToDie + 1;
+        int pigs = ceil(log(buckets) / log(states));
+        return pigs;
+    }
+};
+```
+
+#### [258. 各位相加](https://leetcode-cn.com/problems/add-digits/)
+
+以三位数为例，各位数字表示三位数为$n = 100a+10b+c$，各位数之和为$a+b+c$，二者之差为$99a+9b$一定是9的倍数
+
+```C++
+class Solution {
+public:
+    int addDigits(int num) {
+        if(num == 0)
+            return 0;
+        num = num % 9;
+        if(num == 0)
+            return 9;
+        else
+            return num;
+    }
+};
+```
+
+#### [319. 灯泡开关(*)](https://leetcode-cn.com/problems/bulb-switcher/)
+
+第i个灯泡的反转次数等于它所有因子（包括1和i）的个数，一开始的状态的灭的，只有反转奇数次才会变成亮的，所以只有因子个数为奇数的灯泡序号才会亮，只有平方数的因子数为奇数（比如$6=1\times6=2\times3$，它们的因子总是成对出现的，而$4=1\times4=2\times2$，只有平方数的平方根因子会只出现1次），所以最终答案等于n以内（包括n和1）的平方数数量，只要计算`sqrt(n)`即可
+
+```C++
+class Solution {
+public:
+    int bulbSwitch(int n) {
+        return sqrt(n + 0.5);
+    }
+};
+```
+
+#### [405. 数字转换为十六进制数](https://leetcode-cn.com/problems/convert-a-number-to-hexadecimal/)
+
+注意输入的为整型，而循环中的移位需要逻辑右移
+
+```C++
+class Solution {
+public:
+    string toHex(int num) {
+        if(num == 0)
+            return "0";
+        string result = "";
+        uint32_t n = num;
+        char temp;
+        while(n != 0)
+        {
+            temp = n & 0xf;
+            if(temp <= 9)
+                result += temp + '0';
+            else
+                result += temp + 'a' - 10;
+            n = n >> 4;
+        }
+        reverse(result.begin(), result.end());
+        return result;
+    }
+};
+```
+
+#### [171. Excel 表列序号](https://leetcode-cn.com/problems/excel-sheet-column-number/)
+
+```C++
+class Solution {
+public:
+    int titleToNumber(string columnTitle) {
+        int result=0, lenth=columnTitle.size();
+        for(int i=0; i<lenth-1; i++)
+        {
+            result += columnTitle[i] - 'A' + 1;
+            result *= 26;
+        }
+        result += columnTitle[lenth - 1] - 'A' + 1;
+        return result;
+    }
+};
+```
+
+#### [168. Excel表列名称](https://leetcode-cn.com/problems/excel-sheet-column-title/)
+
+每轮循环要减一
+
+```C++
+class Solution {
+public:
+    string convertToTitle(int columnNumber) {
+        string result = "";
+        while(columnNumber > 0)
+        {
+            columnNumber--;
+            result += columnNumber % 26 + 'A';
+            columnNumber /= 26;
+        }
+        reverse(result.begin(), result.end());
+        return result;
+    }
+};
+```
+
+#### [670. 最大交换](https://leetcode-cn.com/problems/maximum-swap/)
+
+要使得最大的数在最高位上，若最高位是最大数，则判断次高位是否为次大数，依次往下判断
+
+```C++
+class Solution {
+public:
+    int maximumSwap(int num) {
+        string str = to_string(num);
+        int len = str.size();
+        for (int i = 0; i < len - 1; i++)
+        {
+            char maxBit =str[i];
+            int index = 0;
+            for (int j = i + 1; j < len; j++)
+            {
+                if (maxBit <= str[j])
+                {
+                    maxBit = str[j];
+                    index = j;
+                }
+            }
+            if (maxBit != str[i])
+            {
+                swap(str[i], str[index]);
+                return stoi(str);
+            }
+        }
+        return num;
+    }
+};
+```
+
+#### [233. 数字 1 的个数(*)](https://leetcode-cn.com/problems/number-of-digit-one/)
+
+![image-20220113174302395](README.assets/image-20220113174302395.png)
+
+```C++
+class Solution {
+public:
+    int countDigitOne(int n) {
+        // mulk 表示 10^k
+        // 在下面的代码中，可以发现 k 并没有被直接使用到（都是使用 10^k）
+        // 但为了让代码看起来更加直观，这里保留了 k
+        long long mulk = 1;
+        int ans = 0;
+        for (int k = 0; n >= mulk; ++k) {
+            ans += (n / (mulk * 10)) * mulk + min(max(n % (mulk * 10) - mulk + 1, 0LL), mulk);
+            mulk *= 10;
+        }
+        return ans;
+    }
+};
+```
+
+#### [357. 计算各个位数不同的数字个数](https://leetcode-cn.com/problems/count-numbers-with-unique-digits/)
+
+对于一个`k`位数，根据排列数原理，最高位不能为零，有9种可能，后面的位从剩下的9个数中选择排列，即$Count=9\times9\times8\times7\times...$
+
+```C++
+class Solution {
+public:
+    int countNumbersWithUniqueDigits(int n) {
+        if(n == 0)
+            return 1;
+        int result=10;
+        int temp=9;
+        for(int i=0; i<n-1; i++)
+        {
+            temp = temp * (9 - i);
+            result += temp;
+        }
+        return result;
+    }
+};
+```
+
