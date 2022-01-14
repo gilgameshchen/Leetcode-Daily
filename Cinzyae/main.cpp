@@ -11,9 +11,7 @@ using namespace std;
 
 int main()
 {
-    vector<int> testnums = {};
-    // Solution S;
-    // cout << S(testnums) << endl;
-    // for (auto num : S(testnums)) cout << num << " ";
+    string test = "";
+    Solution S;
     return 0;
 }
