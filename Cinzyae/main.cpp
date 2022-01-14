@@ -12,7 +12,6 @@ using namespace std;
 int main()
 {
     vector<int> testnums = {};
-    vector<int>::iterator iter=testnums.begin();
     // Solution S;
     // cout << S(testnums) << endl;
     // for (auto num : S(testnums)) cout << num << " ";
