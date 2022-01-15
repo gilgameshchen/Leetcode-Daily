@@ -1685,3 +1685,207 @@ public:
 };
 ```
 
+#### [686. 重复叠加字符串匹配(*)](https://leetcode-cn.com/problems/repeated-string-match/)
+
+```C++
+class Solution {
+public:
+    int strStr(string &haystack, string &needle) {
+        int n = haystack.size(), m = needle.size();
+        if (m == 0) {
+            return 0;
+        }
+        vector<int> pi(m);
+        for (int i = 1, j = 0; i < m; i++) {
+            while (j > 0 && needle[i] != needle[j]) {
+                j = pi[j - 1];
+            }
+            if (needle[i] == needle[j]) {
+                j++;
+            }
+            pi[i] = j;
+        }
+        for (int i = 0, j = 0; i - j < n; i++) { // b 开始匹配的位置是否超过第一个叠加的 a
+            while (j > 0 && haystack[i % n] != needle[j]) { // haystack 是循环叠加的字符串，所以取 i % n
+                j = pi[j - 1];
+            }
+            if (haystack[i % n] == needle[j]) {
+                j++;
+            }
+            if (j == m) {
+                return i - m + 1;
+            }
+        }
+        return -1;
+    }
+
+    int repeatedStringMatch(string a, string b) {
+        int an = a.size(), bn = b.size();
+        int index = strStr(a, b);
+        if (index == -1) {
+            return -1;
+        }
+        if (an - index >= bn) {
+            return 1;
+        }
+        return (bn + index - an - 1) / an + 2;
+    }
+};
+```
+
+#### [459. 重复的子字符串](https://leetcode-cn.com/problems/repeated-substring-pattern/)
+
+假设母串`S`是由子串`s`重复`N`次得到，则有`S=Ns, 2S=2Ns`，对`2S`，删去第一个和最后一个字符至多破坏2个`s`，此时剩余`2(N-1)s`，当`N>=2`时，至少还包含一个`s`
+
+```python
+class Solution:
+    def repeatedSubstringPattern(self, s: str) -> bool:
+        return s in (s + s)[1 : -1]
+```
+
+#### [214. 最短回文串(*)](https://leetcode-cn.com/problems/shortest-palindrome/)
+
+```C++
+class Solution {
+public:
+    string shortestPalindrome(string s) {
+        int n = s.size();
+        vector<int> fail(n, -1);
+        for (int i = 1; i < n; ++i) {
+            int j = fail[i - 1];
+            while (j != -1 && s[j + 1] != s[i]) {
+                j = fail[j];
+            }
+            if (s[j + 1] == s[i]) {
+                fail[i] = j + 1;
+            }
+        }
+        int best = -1;
+        for (int i = n - 1; i >= 0; --i) {
+            while (best != -1 && s[best + 1] != s[i]) {
+                best = fail[best];
+            }
+            if (s[best + 1] == s[i]) {
+                ++best;
+            }
+        }
+        string add = (best == n - 1 ? "" : s.substr(best + 1, n));
+        reverse(add.begin(), add.end());
+        return add + s;
+    }
+};
+```
+#### [5. 最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring/)
+
+动态规划
+
+![image-20220112103652791](README.assets/image-20220112103652791.png)
+
+```C++
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        int i=0, j=0, temp=1, begin=0, lenth=s.size();
+        if(lenth < 2)
+            return s;
+        vector<vector<bool>> DP(lenth, vector<bool>(lenth, false));
+        for(i=0; i<lenth; i++)
+            DP[i][i] = true;
+        for(int L=2; L<=lenth; L++)
+        {
+            for(i=0; i<lenth; i++)
+            {
+                j = i + L - 1;
+                if(j >= lenth)
+                    break;
+                if(s[i] != s[j])
+                    DP[i][j] = false;
+                else
+                {
+                    if(j - i < 3)
+                        DP[i][j] = true;
+                    else
+                        DP[i][j] = DP[i+1][j-1];
+                }
+                if(DP[i][j] && j - i + 1 > temp)
+                {
+                    temp = j - i + 1;
+                    begin = i;
+                }
+            }
+        }
+        return s.substr(begin, temp);
+    }
+};
+```
+
+#### [647. 回文子串](https://leetcode-cn.com/problems/palindromic-substrings/)
+
+同上题设置的动态规划数组
+
+```C++
+class Solution {
+public:
+    int countSubstrings(string s) {
+        int i=0, j=0, result=0, lenth=s.size();
+        vector<vector<bool>> DP(lenth, vector<bool>(lenth, false));
+        for(i=0; i<lenth; i++)
+            DP[i][i] = true;
+        for(int L=2; L<=lenth; L++)
+        {
+            for(i=0; i<lenth; i++)
+            {
+                j = i + L - 1;
+                if(j >= lenth)
+                    break;
+                if(s[i] != s[j])
+                    continue;
+                else
+                {
+                    if(j - i < 3)
+                        DP[i][j] = true;
+                    else
+                        DP[i][j] = DP[i+1][j-1];
+                }
+            }
+        }
+        for(i=0; i<lenth; i++)
+            for(j=i; j<lenth; j++)
+                if(DP[i][j])
+                    result++;
+        return result;
+    }
+};class Solution {
+public:
+    int countSubstrings(string s) {
+        int i=0, j=0, result=0, lenth=s.size();
+        vector<vector<bool>> DP(lenth, vector<bool>(lenth, false));
+        for(i=0; i<lenth; i++)
+            DP[i][i] = true;
+        for(int L=2; L<=lenth; L++)
+        {
+            for(i=0; i<lenth; i++)
+            {
+                j = i + L - 1;
+                if(j >= lenth)
+                    break;
+                if(s[i] != s[j])
+                    continue;
+                else
+                {
+                    if(j - i < 3)
+                        DP[i][j] = true;
+                    else
+                        DP[i][j] = DP[i+1][j-1];
+                }
+            }
+        }
+        for(i=0; i<lenth; i++)
+            for(j=i; j<lenth; j++)
+                if(DP[i][j])
+                    result++;
+        return result;
+    }
+};
+```
+
