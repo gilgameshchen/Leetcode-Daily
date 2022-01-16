@@ -60,5 +60,5 @@ git push -u origin master
 
 点击open pull request，填写你的pr信息，等待鹏神同意合并即可 : )
 
-
-
+## How to Contribute : simplified
+直接運行auto.bat，只需要輸入完成天數作爲git commit，若直接回車則commit當天日期。

@@ -6,7 +6,7 @@ git fetch upstream
 git checkout master
 git merge upstream/master
 git add .
-for /f "delims=" %%A in ('git config user.name') do set "gitusername=%%A"
+@ for /f "delims=" %%A in ('git config user.name') do set "gitusername=%%A"
 @set /p commit=input day:   
 @ if defined commit (git commit -m "%gitusername% finish day %commit%") else (git commit -m "%defaultcommit%")
 git push
