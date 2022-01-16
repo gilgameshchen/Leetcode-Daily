@@ -612,3 +612,201 @@ public:
 };
 ```
 
+#### [400. 第 N 位数字](https://leetcode-cn.com/problems/nth-digit/)
+
+* 第一步，计算n所在的数字属于几位数；
+* 第二步，确定n所在的数字；
+* 第三步，确定n所代表的位数
+
+```C++
+class Solution {
+public:
+    int findNthDigit(int n) {
+        int d = 1, count = 9;
+        while (n > (long) d * count) {
+            n -= d * count;
+            d++;
+            count *= 10;
+        }
+        int index = n - 1;
+        int start = (int) pow(10, d - 1);
+        int num = start + index / d;
+        int digitIndex = index % d;
+        int digit = (num / (int) (pow(10, d - digitIndex - 1))) % 10;
+        return digit;
+    }
+};
+```
+
+#### [492. 构造矩形](https://leetcode-cn.com/problems/construct-the-rectangle/)
+
+从$\sqrt{area}$开始计算
+
+```C++
+class Solution {
+public:
+    vector<int> constructRectangle(int area) {
+        int mid=(int)sqrt(area);
+        int L=mid;
+        while(area % L != 0)
+            L++;
+        vector<int> result = {L, area / L};
+        if(result[0] < result[1])
+            swap(result[0], result[1]);
+        return result;
+    }
+};
+```
+
+#### [29. 两数相除(*)](https://leetcode-cn.com/problems/divide-two-integers/)
+
+```C++
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        // 考虑被除数为最小值的情况
+        if (dividend == INT_MIN) {
+            if (divisor == 1) {
+                return INT_MIN;
+            }
+            if (divisor == -1) {
+                return INT_MAX;
+            }
+        }
+        // 考虑除数为最小值的情况
+        if (divisor == INT_MIN) {
+            return dividend == INT_MIN ? 1 : 0;
+        }
+        // 考虑被除数为 0 的情况
+        if (dividend == 0) {
+            return 0;
+        }
+        
+        // 一般情况，使用类二分查找
+        // 将所有的正数取相反数，这样就只需要考虑一种情况
+        bool rev = false;
+        if (dividend > 0) {
+            dividend = -dividend;
+            rev = !rev;
+        }
+        if (divisor > 0) {
+            divisor = -divisor;
+            rev = !rev;
+        }
+
+        vector<int> candidates = {divisor};
+        // 注意溢出
+        while (candidates.back() >= dividend - candidates.back()) {
+            candidates.push_back(candidates.back() + candidates.back());
+        }
+        int ans = 0;
+        for (int i = candidates.size() - 1; i >= 0; --i) {
+            if (candidates[i] >= dividend) {
+                ans += (1 << i);
+                dividend -= candidates[i];
+            }
+        }
+
+        return rev ? -ans : ans;
+    }
+};
+```
+
+#### [507. 完美数](https://leetcode-cn.com/problems/perfect-number/)
+
+* 从2到$\sqrt{num}$枚举，添加每一对因数
+* 穷举，范围内的完美数只有5个
+
+```C++
+class Solution {
+public:
+    bool checkPerfectNumber(int num) {
+        if(num == 1)
+            return false;
+        int sum = 1;
+        int i = 2;
+        while(i * i <= num)
+        {
+            if(num % i == 0)
+            {
+                sum += i;
+                if(i * i != num)
+                    sum += num / i;
+            }
+            if(sum > num)
+                return false;
+            i++;
+        }
+        return (sum == num);
+    }
+};
+```
+
+#### [50. Pow(x, n)(*)](https://leetcode-cn.com/problems/powx-n/)
+
+快速幂算法
+
+![image-20220114105818263](README.assets/image-20220114105818263.png)![image-20220114105829120](README.assets/image-20220114105829120.png)
+
+```C++
+class Solution {
+public:
+    double quickMul(double x, long long N) {
+        double ans = 1.0;
+        // 贡献的初始值为 x
+        double x_contribute = x;
+        // 在对 N 进行二进制拆分的同时计算答案
+        while (N > 0) {
+            if (N % 2 == 1) {
+                // 如果 N 二进制表示的最低位为 1，那么需要计入贡献
+                ans *= x_contribute;
+            }
+            // 将贡献不断地平方
+            x_contribute *= x_contribute;
+            // 舍弃 N 二进制表示的最低位，这样我们每次只要判断最低位即可
+            N /= 2;
+        }
+        return ans;
+    }
+
+    double myPow(double x, int n) {
+        long long N = n;
+        return N >= 0 ? quickMul(x, N) : 1.0 / quickMul(x, -N);
+    }
+};
+```
+
+#### [372. 超级次方(*)](https://leetcode-cn.com/problems/super-pow/)
+
+![image-20220114110016971](README.assets/image-20220114110016971.png)![image-20220114110028793](README.assets/image-20220114110028793.png)
+
+```C++
+class Solution {
+    const int MOD = 1337;
+
+    int pow(int x, int n) {
+        int res = 1;
+        while (n) {
+            if (n % 2) {
+                res = (long) res * x % MOD;
+            }
+            x = (long) x * x % MOD;
+            n /= 2;
+        }
+        return res;
+    }
+
+public:
+    int superPow(int a, vector<int> &b) {
+        int ans = 1;
+        for (int i = b.size() - 1; i >= 0; --i) {
+            ans = (long) ans * pow(a, b[i]) % MOD;
+            a = pow(a, 10);
+        }
+        return ans;
+    }
+};
+```
+
+
+

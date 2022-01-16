@@ -271,3 +271,329 @@ public:
 };
 ```
 
+#### [636. 函数的独占时间(*)](https://leetcode-cn.com/problems/exclusive-time-of-functions/)
+
+```python
+class Solution:
+    def exclusiveTime(self, n: int, logs: List[str]) -> List[int]:
+        res = [0] * n
+        stack = []
+        for s in logs:
+            temp = s.split(':')
+            if temp[1] == 'start':
+                stack.append(temp)
+            else:
+                time = int(temp[2]) - int(stack.pop()[2]) + 1
+                res[int(temp[0])] += time
+                if stack:
+                    res[int(stack[-1][0])] -= time   
+        return res
+```
+
+#### [591. 标签验证器(*)](https://leetcode-cn.com/problems/tag-validator/)
+
+正则表达式
+
+```python
+class Solution:
+    def isValid(self, code: str) -> bool:
+        code = re.sub(r'<!\[CDATA\[.*?\]\]>|t', '-', code)
+        prev = None
+        while code != prev:
+            prev = code
+            code = re.sub(r'<([A-Z]{1,9})>[^<]*</\1>', 't', code)
+        return code == 't'
+```
+
+#### [32. 最长有效括号](https://leetcode-cn.com/problems/longest-valid-parentheses/)
+
+设置一个标记数组，将所有可以匹配的括号位置标记为1，问题转化为最长连续1的长度
+
+```python
+class Solution:
+    def longestValidParentheses(self, s: str) -> int:
+        mark = [0] * len(s)
+        stack = []
+        for i in range(len(s)):
+            if s[i] == '(':
+                stack.append(i)
+            else:
+                if len(stack) != 0:
+                    mark[i] = 1
+                    mark[stack[-1]] = 1
+                    stack.pop()
+        count = 0
+        result = 0
+        for i in range(len(mark)):
+            if mark[i] == 1:
+                count += 1
+            else:
+                count = 0
+                continue
+            result = max(count, result)
+        return result
+```
+
+#### [385. 迷你语法分析器(*)](https://leetcode-cn.com/problems/mini-parser/)
+
+```C++
+/**
+ * // This is the interface that allows for creating nested lists.
+ * // You should not implement it, or speculate about its implementation
+ * class NestedInteger {
+ *   public:
+ *     // Constructor initializes an empty nested list.
+ *     NestedInteger();
+ *
+ *     // Constructor initializes a single integer.
+ *     NestedInteger(int value);
+ *
+ *     // Return true if this NestedInteger holds a single integer, rather than a nested list.
+ *     bool isInteger() const;
+ *
+ *     // Return the single integer that this NestedInteger holds, if it holds a single integer
+ *     // The result is undefined if this NestedInteger holds a nested list
+ *     int getInteger() const;
+ *
+ *     // Set this NestedInteger to hold a single integer.
+ *     void setInteger(int value);
+ *
+ *     // Set this NestedInteger to hold a nested list and adds a nested integer to it.
+ *     void add(const NestedInteger &ni);
+ *
+ *     // Return the nested list that this NestedInteger holds, if it holds a nested list
+ *     // The result is undefined if this NestedInteger holds a single integer
+ *     const vector<NestedInteger> &getList() const;
+ * };
+ */
+class Solution {
+public:
+    NestedInteger deserialize(string s) {
+        if(s.empty()) return NestedInteger();
+        if(s[0]!='[')  return NestedInteger(stoi(s));
+        if(s.size()<=2) return NestedInteger();
+        NestedInteger res;
+        int start=1,cnt=0;
+        for (int i=1;i<s.size();i++){
+            if(cnt==0&&(s[i]==','||i==s.size()-1)){
+                res.add(deserialize(s.substr(start,i-start)));
+                start=i+1;
+            } 
+            else if(s[i]=='[') cnt++;
+            else if(s[i]==']') cnt--;
+        }
+        return res;
+    }
+};
+```
+
+#### [341. 扁平化嵌套列表迭代器(*)](https://leetcode-cn.com/problems/flatten-nested-list-iterator/)
+
+```java
+/**
+ * // This is the interface that allows for creating nested lists.
+ * // You should not implement it, or speculate about its implementation
+ * public interface NestedInteger {
+ *
+ *     // @return true if this NestedInteger holds a single integer, rather than a nested list.
+ *     public boolean isInteger();
+ *
+ *     // @return the single integer that this NestedInteger holds, if it holds a single integer
+ *     // Return null if this NestedInteger holds a nested list
+ *     public Integer getInteger();
+ *
+ *     // @return the nested list that this NestedInteger holds, if it holds a nested list
+ *     // Return empty list if this NestedInteger holds a single integer
+ *     public List<NestedInteger> getList();
+ * }
+ */
+public class NestedIterator implements Iterator<Integer> {
+    private List<Integer> list = new ArrayList<>();
+    private int index;
+
+    private void add(List<NestedInteger> nestedList)
+    {
+        for(NestedInteger nestedInteger:nestedList)
+        {
+            if(nestedInteger.isInteger())
+            {
+                list.add(nestedInteger.getInteger());
+            }
+            else
+            {
+                add(nestedInteger.getList());
+            }
+        }
+    }
+    public NestedIterator(List<NestedInteger> nestedList) {
+        add(nestedList);
+    }
+
+    @Override
+    public Integer next() {
+        return list.get(index++);
+    }
+
+    @Override
+    public boolean hasNext() {
+        return index < list.size();
+    }
+}
+
+/**
+ * Your NestedIterator object will be instantiated and called as such:
+ * NestedIterator i = new NestedIterator(nestedList);
+ * while (i.hasNext()) v[f()] = i.next();
+ */
+```
+
+#### [394. 字符串解码(*)](https://leetcode-cn.com/problems/decode-string/)
+
+递归实现
+
+```C++
+class Solution {
+public:
+    string src; 
+    size_t ptr;
+
+    int getDigits() {
+        int ret = 0;
+        while (ptr < src.size() && isdigit(src[ptr])) {
+            ret = ret * 10 + src[ptr++] - '0';
+        }
+        return ret;
+    }
+
+    string getString() {
+        if (ptr == src.size() || src[ptr] == ']') {
+            // String -> EPS
+            return "";
+        }
+
+        char cur = src[ptr]; int repTime = 1;
+        string ret;
+
+        if (isdigit(cur)) {
+            // String -> Digits [ String ] String
+            // 解析 Digits
+            repTime = getDigits(); 
+            // 过滤左括号
+            ++ptr;
+            // 解析 String
+            string str = getString(); 
+            // 过滤右括号
+            ++ptr;
+            // 构造字符串
+            while (repTime--) ret += str; 
+        } else if (isalpha(cur)) {
+            // String -> Char String
+            // 解析 Char
+            ret = string(1, src[ptr++]);
+        }
+        
+        return ret + getString();
+    }
+
+    string decodeString(string s) {
+        src = s;
+        ptr = 0;
+        return getString();
+    }
+};
+```
+
+#### [203. 移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements/)
+
+设立一前一后两个指针
+
+```C
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     struct ListNode *next;
+ * };
+ */
+struct ListNode* removeElements(struct ListNode* head, int val){
+    struct ListNode *p = head;
+    struct ListNode *q;
+    if(p == NULL)
+        return p;
+    if(p -> next == NULL && p -> val != val)
+        return p;
+    while(p != NULL)
+    {
+        q = p -> next;
+        if(q != NULL && q -> val == val)
+        {
+            p -> next = q -> next;
+            free(q);
+        }
+        else
+            p = p -> next;
+    }
+    if(head != NULL && head -> val == val)
+        return head -> next;
+    else
+        return head;
+}
+```
+
+#### [237. 删除链表中的节点](https://leetcode-cn.com/problems/delete-node-in-a-linked-list/)
+
+将下一个节点（若存在）的值赋给该节点，然后删除下一个节点
+
+```C
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     struct ListNode *next;
+ * };
+ */
+void deleteNode(struct ListNode* node) {
+    struct ListNode *p;
+    if(node -> next == NULL)
+        free(node);
+    else
+    {
+        node -> val = node -> next -> val;
+        p = node -> next;
+        node -> next = node -> next -> next;
+        free(p);
+    }
+}
+```
+
+#### [19. 删除链表的倒数第 N 个结点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
+
+设置快慢两个指针，快指针先走`N`步，然后两个指针一起走，直到快指针到达最后一个节点，删除慢指针的后一个节点即可
+
+```C
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     struct ListNode *next;
+ * };
+ */
+
+
+struct ListNode* removeNthFromEnd(struct ListNode* head, int n){
+    struct ListNode *p=head, *q=head;
+    int i = 0;
+    for(i=0; i<n; i++)
+        p = p -> next;
+    if(p == NULL)
+        return head -> next;
+    while(p -> next != NULL)
+    {
+        p = p -> next;
+        q = q -> next;
+    }
+    q -> next = q -> next -> next;
+    return head;
+}
+```
+
