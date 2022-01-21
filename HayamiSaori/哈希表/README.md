@@ -558,3 +558,205 @@ class Solution:
         return result
 ```
 
+#### [554. 砖墙(*)](https://leetcode-cn.com/problems/brick-wall/)
+
+由于砖墙是一面矩形，所以对于任意一条垂线，其穿过的砖块数量加上从边缘经过的砖块数量之和是一个定值，即砖墙的高度。
+
+因此，问题可以转换成求「垂线穿过的砖块边缘数量的最大值」，用砖墙的高度减去该最大值即为答案。
+
+虽然垂线在每行至多只能通过一个砖块边缘，但是每行的砖块边缘也各不相同，因此我们需要用哈希表统计所有符合要求的砖块边缘的数量。
+
+注意到题目要求垂线不能通过砖墙的两个垂直边缘，所以砖墙两侧的边缘不应当被统计。因此，我们只需要统计每行砖块中除了最右侧的砖块以外的其他砖块的右边缘即可。
+
+具体地，我们遍历砖墙的每一行，对于当前行，我们从左到右地扫描每一块砖，使用一个累加器记录当前砖的右侧边缘到砖墙的左边缘的距离，将除了最右侧的砖块以外的其他砖块的右边缘到砖墙的左边缘的距离加入到哈希表中。最后我们遍历该哈希表，找到出现次数最多的砖块边缘，这就是垂线经过的砖块边缘，而该垂线经过的砖块数量即为砖墙的高度减去该垂线经过的砖块边缘的数量。
+
+```C++
+class Solution {
+public:
+    int leastBricks(vector<vector<int>>& wall) {
+        unordered_map<int, int> cnt;
+        for (auto& widths : wall) {
+            int n = widths.size();
+            int sum = 0;
+            for (int i = 0; i < n - 1; i++) {
+                sum += widths[i];
+                cnt[sum]++;
+            }
+        }
+        int maxCnt = 0;
+        for (auto& [_, c] : cnt) {
+            maxCnt = max(maxCnt, c);
+        }
+        return wall.size() - maxCnt;
+    }
+};
+```
+
+#### [609. 在系统中查找重复文件](https://leetcode-cn.com/problems/find-duplicate-file-in-system/)
+
+体力劳动，字符串哈希表
+
+```python
+class Solution:
+    def findDuplicate(self, paths: List[str]) -> List[List[str]]:
+        d={}
+        for i in paths:
+            arr= i.split( );
+            for j in range(1,len(arr)):
+                t= arr[j].split('(')
+                d.setdefault(t[1],[])
+                d[t[1]].append(arr[0]+'/'+t[0])
+        return [i for i in d.values() if len(i)>1]
+```
+
+#### [454. 四数相加 II](https://leetcode-cn.com/problems/4sum-ii/)
+
+设`A+B+C+D=0`，令`A,B=target1`一组，`C,D=target2`一组，计算出两个`target`的所有可能的和，以及组合的数目
+
+```python
+class Solution:
+    def fourSumCount(self, nums1: List[int], nums2: List[int], nums3: List[int], nums4: List[int]) -> int:
+        result = 0
+        count1 = {}
+        count2 = {}
+        lenth = len(nums1)
+        for i in range(lenth):
+            for j in range(lenth):
+                if nums1[i] + nums2[j] in count1:
+                    count1[nums1[i] + nums2[j]] += 1
+                else:
+                    count1[nums1[i] + nums2[j]] = 1
+                if nums3[i] + nums4[j] in count2:
+                    count2[nums3[i] + nums4[j]] += 1
+                else:
+                    count2[nums3[i] + nums4[j]] = 1
+        for c in count1:
+            if -c in count2:
+                result += count1[c] * count2[-c]
+        return result
+```
+
+#### [18. 四数之和(*)](https://leetcode-cn.com/problems/4sum/)
+
+```python
+class Solution:
+    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
+        quadruplets = list()
+        if not nums or len(nums) < 4:
+            return quadruplets
+        
+        nums.sort()
+        length = len(nums)
+        for i in range(length - 3):
+            if i > 0 and nums[i] == nums[i - 1]:
+                continue
+            if nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3] > target:
+                break
+            if nums[i] + nums[length - 3] + nums[length - 2] + nums[length - 1] < target:
+                continue
+            for j in range(i + 1, length - 2):
+                if j > i + 1 and nums[j] == nums[j - 1]:
+                    continue
+                if nums[i] + nums[j] + nums[j + 1] + nums[j + 2] > target:
+                    break
+                if nums[i] + nums[j] + nums[length - 2] + nums[length - 1] < target:
+                    continue
+                left, right = j + 1, length - 1
+                while left < right:
+                    total = nums[i] + nums[j] + nums[left] + nums[right]
+                    if total == target:
+                        quadruplets.append([nums[i], nums[j], nums[left], nums[right]])
+                        while left < right and nums[left] == nums[left + 1]:
+                            left += 1
+                        left += 1
+                        while left < right and nums[right] == nums[right - 1]:
+                            right -= 1
+                        right -= 1
+                    elif total < target:
+                        left += 1
+                    else:
+                        right -= 1
+        
+        return quadruplets
+```
+
+#### [560. 和为 K 的子数组](https://leetcode-cn.com/problems/subarray-sum-equals-k/)
+
+设置一个字典，保存每个前缀和出现的次数，遍历数组，判断`sum-k`是否在字典中
+
+```python
+class Solution:
+    def subarraySum(self, nums: List[int], k: int) -> int:
+        sum = 0
+        mark = {}
+        mark[0] = 1
+        result = 0
+        for n in nums:
+            sum += n
+            if sum - k in mark:
+                result += mark[sum - k]
+            if sum in mark:
+                mark[sum] += 1
+            else:
+                mark[sum] = 1
+        return result
+```
+
+#### [523. 连续的子数组和](https://leetcode-cn.com/problems/continuous-subarray-sum/)
+
+同上题类似
+
+```C++
+class Solution {
+public:
+    bool checkSubarraySum(vector<int>& nums, int k) {
+        int m = nums.size();
+        if (m < 2)
+            return false;
+        unordered_map<int, int> mp;
+        mp[0] = -1;
+        int remainder = 0;
+        for (int i = 0; i < m; i++) 
+        {
+            remainder = (remainder + nums[i]) % k;
+            if (mp.count(remainder)) 
+            {
+                int prevIndex = mp[remainder];
+                if (i - prevIndex >= 2)
+                    return true;
+            }
+            else
+                mp[remainder] = i;
+        }
+        return false;
+    }
+};
+```
+
+#### [525. 连续数组](https://leetcode-cn.com/problems/contiguous-array/)
+
+将0变为-1，转化为查找和为0的最长连续子数组
+
+```C++
+class Solution {
+public:
+    int findMaxLength(vector<int>& nums) {
+        for(auto& n:nums)
+            if(n == 0) n = -1;
+        unordered_map<int, int> mymap;
+        int presum=0, result=0;
+        for(int i=0; i<nums.size(); i++)
+        {
+            presum += nums[i];
+            if(presum == 0 && i > result)
+                result = i + 1;
+            if(mymap.find(presum) != mymap.end())
+                result = i - mymap[presum] > result ? i - mymap[presum] : result;
+            else
+                mymap[presum] = i;
+        }
+        return result;
+    }
+};
+```
+
