@@ -43,16 +43,62 @@ class Solution
 public:
     string fractionAddition(string expression)
     {
-        int num = expression.find('/');
-        do
+        vector<int> fz, fm;
+        int sig = 0, flag = 0;
+        int n = expression.size();
+        for (int i = 0; i < n; i++)
         {
-            ; // TODO
-        } while (num < 0);
+            if (expression[i] == '+')
+                sig = i;
+            if (expression[i] == '-')
+                sig = i;
+            else if (expression[i] == '/')
+                flag = i + 1;
+            else if (i == n - 1 || expression[i + 1] == '+' || expression[i + 1] == '-')
+            {
+                fz.push_back(stoi(expression.substr(sig, i)));
+                fm.push_back(stoi(expression.substr(flag, i)));
+            }
+        }
+        // for (int i = 0; i < fz.size(); i++)
+        // {
+        //     cout << fz[i] << '/' << fm[i] << endl;
+        // }
+        int ffz = fz[0], ffm = fm[0];
+        for (int i = 1; i < fz.size(); i++)
+        {
+            // cout << ffz << ffm << fz[i] << fm[i] << endl;
+            ffz = ffz * fm[i] + ffm * fz[i];
+            ffm *= fm[i];
+            // cout << ffz << ffm << endl;
+        }
+        int retsig = 1;
+        if (((ffz < 0) && (ffm > 0)) || ((ffz > 0) && (ffm < 0)))
+        {
+            retsig = -1;
+        }
+        // cout << retsig << endl;
+        ffz = abs(ffz);
+        ffm = abs(ffm);
+        int gcdnum = gcd(ffz, ffm);
+        return to_string(retsig * (ffz / gcdnum)) + '/' + to_string(ffm / gcdnum);
+    }
+    int gcd(int a, int b)
+    {
+        int r;
+        while (b > 0)
+        {
+            r = a % b;
+            a = b;
+            b = r;
+        }
+        return a;
     }
 };
 int main()
 {
-    string test = "";
+    string test = "4/1+6/5-1/8-9/2-1/1+6/7-10/7-3/4-3/2-1/1";
     Solution S;
+    cout << S.fractionAddition(test) << endl;
     return 0;
 }
