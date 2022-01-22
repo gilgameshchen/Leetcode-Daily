@@ -1,5 +1,6 @@
 /*
-求解一个给定的方程，将x以字符串"x=#value"的形式返回。该方程仅包含'+'，' - '操作，变量 x 和其对应系数。
+求解一个给定的方程，将x以字符串"x=#value"的形式返回。该方程仅包含'+'，' -
+'操作，变量 x 和其对应系数。
 
 如果方程没有解，请返回“No solution”。
 
@@ -36,92 +37,62 @@
 链接：https://leetcode-cn.com/problems/solve-the-equation
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 */
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <iostream>
 #include <map>
+#include <vector>
 using namespace std;
-class Solution
-{
+class Solution {
 public:
-    string solveEquation(string equation)
+    string
+    solveEquation(string equation)
     {
         int n = equation.size();
         vector<int> left, right;
         int sig = 0, leftx = 0, rightx = 0;
-        for (int i = sig; i < n; i++)
-        {
-            if (equation[i] == '=')
-            {
+        for (int i = sig; i < n; i++) {
+            if (equation[i] == '=') {
                 sig = i + 1;
                 break;
-            }
-            else if (equation[i] == '+')
-            {
+            } else if (equation[i] == '+') {
                 sig = i;
-            }
-            else if (equation[i] == '-')
-            {
+            } else if (equation[i] == '-') {
                 sig = i;
-            }
-            else if (equation[i] == 'x')
-            {
-                if (sig + 1 < i)
-                {
+            } else if (equation[i] == 'x') {
+                if (sig + 1 < i) {
                     leftx += stoi(equation.substr(sig, i + 1));
-                }
-                else if (isdigit(equation[sig]))
-                {
+                } else if (isdigit(equation[sig])) {
                     leftx += stoi(equation.substr(sig, i + 1));
-                }
-                else if (equation[sig] == '+' || equation[sig] == 'x')
-                {
+                } else if (equation[sig] == '+' || equation[sig] == 'x') {
                     leftx++;
-                }
-                else if (equation[sig] == '-')
-                {
+                } else if (equation[sig] == '-') {
                     leftx--;
                 }
                 cout << leftx << ' ';
-            }
-            else if (equation[i + 1] == '=' || equation[i + 1] == '+' || equation[i + 1] == '-')
-            {
+            } else if (equation[i + 1] == '=' || equation[i + 1] == '+'
+                || equation[i + 1] == '-') {
                 left.push_back(stoi(equation.substr(sig, i + 1)));
             }
         }
         cout << endl;
-        for (int i = sig; i < n; i++)
-        {
-            if (equation[i] == '+')
-            {
+        for (int i = sig; i < n; i++) {
+            if (equation[i] == '+') {
                 sig = i;
-            }
-            else if (equation[i] == '-')
-            {
+            } else if (equation[i] == '-') {
                 sig = i;
-            }
-            else if (equation[i] == 'x')
-            {
-                if (sig + 1 < i)
-                {
+            } else if (equation[i] == 'x') {
+                if (sig + 1 < i) {
                     rightx += stoi(equation.substr(sig, i + 1));
-                }
-                else if (isdigit(equation[sig]))
-                {
+                } else if (isdigit(equation[sig])) {
                     rightx += stoi(equation.substr(sig, i + 1));
-                }
-                else if (equation[sig] == '+' || equation[sig] == 'x')
-                {
+                } else if (equation[sig] == '+' || equation[sig] == 'x') {
                     rightx++;
-                }
-                else if (equation[sig] == '-')
-                {
+                } else if (equation[sig] == '-') {
                     rightx--;
                 }
                 cout << rightx << ' ';
-            }
-            else if (i == n - 1 || equation[i + 1] == '+' || equation[i + 1] == '-')
-            {
+            } else if (i == n - 1 || equation[i + 1] == '+'
+                || equation[i + 1] == '-') {
                 right.push_back(stoi(equation.substr(sig, i + 1)));
             }
         }
@@ -139,35 +110,24 @@ public:
         // cout << rightx;
 
         int acc = 0;
-        for (auto num : left)
-        {
+        for (auto num : left) {
             acc -= num;
         }
-        for (auto num : right)
-        {
+        for (auto num : right) {
             acc += num;
         }
 
-        if (leftx == rightx)
-        {
-            if (acc)
-            {
+        if (leftx == rightx) {
+            if (acc) {
                 return "No solution";
-            }
-            else
-            {
+            } else {
                 return "Infinite solutions";
             }
-        }
-        else
-        {
-            if (acc)
-            {
+        } else {
+            if (acc) {
                 acc /= (leftx - rightx);
                 return "x=" + to_string(acc);
-            }
-            else
-            {
+            } else {
                 return "x=0";
             }
         }
