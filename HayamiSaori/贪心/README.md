@@ -167,3 +167,48 @@ class Solution:
         return result
 ```
 
+#### [621. 任务调度器(*)](https://leetcode-cn.com/problems/task-scheduler/)
+
+```python
+class Solution:
+    def leastInterval(self, tasks: List[str], n: int) -> int:
+        freq = collections.Counter(tasks)
+
+        # 最多的执行次数
+        maxExec = max(freq.values())
+        # 具有最多执行次数的任务数量
+        maxCount = sum(1 for v in freq.values() if v == maxExec)
+
+        return max((maxExec - 1) * (n + 1) + maxCount, len(tasks))
+```
+
+#### [179. 最大数(*)](https://leetcode-cn.com/problems/largest-number/)
+
+对于两个数`x,y`比较`x-y`和`y-x`大小，较大的放左边（高位）
+
+```C++
+class Solution {
+public:
+    string largestNumber(vector<int> &nums) {
+        sort(nums.begin(), nums.end(), [](const int &x, const int &y) {
+            long sx = 10, sy = 10;
+            while (sx <= x) {
+                sx *= 10;
+            }
+            while (sy <= y) {
+                sy *= 10;
+            }
+            return sy * x + y > sx * y + x;
+        });
+        if (nums[0] == 0) {
+            return "0";
+        }
+        string ret;
+        for (int &x : nums) {
+            ret += to_string(x);
+        }
+        return ret;
+    }
+};
+```
+
