@@ -11,7 +11,6 @@ using namespace std;
 
 int main()
 {
-    string test = "";
     Solution S;
     return 0;
 }
