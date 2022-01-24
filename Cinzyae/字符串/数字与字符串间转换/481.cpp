@@ -32,19 +32,68 @@ s 的前几个元素是 s = "1221121221221121122……" 。如果将 s 中连续
 链接：https://leetcode-cn.com/problems/magical-string
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 */
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <iostream>
 #include <map>
+#include <vector>
 using namespace std;
 class Solution {
 public:
-    int magicalString(int n) {
-
+    int magicalString(int n)
+    {
+        string str = "122";
+        int mark = 1, acc = 1;
+        for (int i = 2; str.size() < n; i++) {
+            if (str[i] == '1') {
+                str.append(to_string(mark));
+                acc += 1 - mark / 2;
+            } else if (str[i] == '2') {
+                str.append(to_string(mark));
+                str.append(to_string(mark));
+                acc += 2 * (1 - mark / 2);
+            }
+            mark = 3 - mark;
+        }
+        cout << str << endl;
+        if (str.size() == n + 1) {
+            if (str[n] == '1') {
+                acc--;
+            }
+        }
+        return acc;
     }
 };
+
 int main()
 {
     Solution S;
+    cout << S.magicalString(4) << endl;
     return 0;
 }
+/*
+class Solution {
+public:
+    int magicalString(int n)
+    {
+        vector<int> num = { 1, 2, 2 };
+        int mark = 1, acc = 1;
+        for (int i = 2; num.size() < n; i++) {
+            if (num[i] == 1) {
+                num.push_back(mark);
+                acc += 1 - mark / 2;
+            } else if (num[i] == 2) {
+                num.push_back(mark);
+                num.push_back(mark);
+                acc += 2 * (1 - mark / 2);
+            }
+            mark = 3 - mark;
+        }
+        if (num.size() == n + 1) {
+            if (num[n] == 1) {
+                acc--;
+            }
+        }
+        return acc;
+    }
+};
+*/
