@@ -212,3 +212,197 @@ public:
 };
 ```
 
+#### [56. 合并区间(*)](https://leetcode-cn.com/problems/merge-intervals/)
+
+![image-20220124100934086](README.assets/image-20220124100934086.png)
+
+```python
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals.sort(key=lambda x: x[0])
+
+        merged = []
+        for interval in intervals:
+            # 如果列表为空，或者当前区间与上一区间不重合，直接添加
+            if not merged or merged[-1][1] < interval[0]:
+                merged.append(interval)
+            else:
+                # 否则的话，我们就可以与上一区间进行合并
+                merged[-1][1] = max(merged[-1][1], interval[1])
+
+        return merged
+```
+
+#### [57. 插入区间](https://leetcode-cn.com/problems/insert-interval/)
+
+利用上一题，将插入的区间加入到原区间组中，调用上题函数即可
+
+```python
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals.sort(key=lambda x: x[0])
+        merged = []
+        for interval in intervals:
+            # 如果列表为空，或者当前区间与上一区间不重合，直接添加
+            if not merged or merged[-1][1] < interval[0]:
+                merged.append(interval)
+            else:
+                # 否则的话，我们就可以与上一区间进行合并
+                merged[-1][1] = max(merged[-1][1], interval[1])
+        return merged
+        
+    def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+        intervals.append(newInterval)
+        return self.merge(intervals)
+```
+
+#### [228. 汇总区间](https://leetcode-cn.com/problems/summary-ranges/)
+
+```python
+class Solution:
+    def summaryRanges(self, nums: List[int]) -> List[str]:
+        if len(nums) == 0:
+            return nums
+        if len(nums) == 1:
+            return [str(nums[0])]
+        # 简化边界判断
+        nums += [0]
+        start = 0
+        result = []
+        for i in range(1, len(nums)):
+            if nums[i] - nums[i-1] == 1:
+                continue
+            else:
+                if i - 1 == start:
+                    result.append(str(nums[start]))
+                else:
+                    temp = str(nums[start]) + "->" + str(nums[i-1])
+                    result.append(temp)
+                start = i
+        return result
+```
+
+#### [452. 用最少数量的箭引爆气球(*)](https://leetcode-cn.com/problems/minimum-number-of-arrows-to-burst-balloons/)
+
+![image-20220124155733219](README.assets/image-20220124155733219.png)
+
+![image-20220124155753047](README.assets/image-20220124155753047.png)
+
+```python
+class Solution:
+    def findMinArrowShots(self, points: List[List[int]]) -> int:
+        if not points:
+            return 0
+        points.sort(key=lambda balloon: balloon[1])
+        pos = points[0][1]
+        ans = 1
+        for balloon in points:
+            if balloon[0] > pos:
+                pos = balloon[1]
+                ans += 1
+        return ans
+```
+
+#### [435. 无重叠区间(*)](https://leetcode-cn.com/problems/non-overlapping-intervals/)
+
+按照起点排序：选择结尾最短的，后面才可能连接更多的区间（如果两个区间有重叠，应该保留结尾小的） 把问题转化为最多能保留多少个区间，使他们互不重复，则按照终点排序，每个区间的结尾很重要，结尾越小，则后面越有可能容纳更多的区间。
+
+```python
+class Solution:
+    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:
+        if not intervals:
+            return 0
+        intervals.sort(key=lambda x: x[1])
+        n = len(intervals)
+        right = intervals[0][1]
+        ans = 1
+        for i in range(1, n):
+            if intervals[i][0] >= right:
+                ans += 1
+                right = intervals[i][1]
+        return n - ans
+```
+
+#### [646. 最长数对链(*)](https://leetcode-cn.com/problems/maximum-length-of-pair-chain/)
+
+![image-20220124161647833](README.assets/image-20220124161647833.png)![image-20220124161653674](README.assets/image-20220124161653674.png)
+
+```python
+class Solution:
+    def findLongestChain(self, pairs: List[List[int]]) -> int:
+        pairs.sort(key = lambda x : x[1])
+        result = 0
+        cur = -inf
+        for pair in pairs:
+            if cur < pair[0]:
+                cur = pair[1]
+                result += 1
+        return result
+```
+
+#### [406. 根据身高重建队列(*)](https://leetcode-cn.com/problems/queue-reconstruction-by-height/)
+
+```python
+class Solution:
+    def reconstructQueue(self, people: List[List[int]]) -> List[List[int]]:
+        people.sort(key=lambda x: (x[0], -x[1]))
+        n = len(people)
+        ans = [[] for _ in range(n)]
+        for person in people:
+            spaces = person[1] + 1
+            for i in range(n):
+                if not ans[i]:
+                    spaces -= 1
+                    if spaces == 0:
+                        ans[i] = person
+                        break
+        return ans
+```
+
+#### [48. 旋转图像](https://leetcode-cn.com/problems/rotate-image/)
+
+```C++
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int m=matrix.size(), n=matrix[0].size();
+        int i=0, j=0;
+        for(i=0; i<m/2; i++)
+            for(j=0; j<n; j++)
+                swap(matrix[i][j], matrix[n-i-1][j]);
+        for(i=0; i<m; i++)
+            for(j=0; j<i; j++)
+                swap(matrix[i][j], matrix[j][i]);
+    }
+};
+```
+
+#### [169. 多数元素](https://leetcode-cn.com/problems/majority-element/)
+
+* 每次删除两个不同元素，剩下最后一个元素即为答案
+* Boyer-Moore投票算法。从第一个数开始，令`vote=0`遇到相同的就加1，遇到不同的就减1，减到`-1`就重新换个数开始计数，总能找到最多的那个
+
+```C++
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int lenth=nums.size(), candidate=nums[0], vote=0;
+        for(auto n:nums)
+        {
+            if(n != candidate)
+            {
+                vote--;
+                if(vote == -1)
+                {
+                    vote = 0;
+                    candidate = n;
+                }
+            }
+            else
+                vote++;
+        }
+        return candidate;
+    }
+};
+```
+
