@@ -406,3 +406,124 @@ public:
 };
 ```
 
+#### [215. 数组中的第K个最大元素(*)](https://leetcode-cn.com/problems/kth-largest-element-in-an-array/)
+
+利用快速排序的交换方法
+
+```C++
+class Solution {
+public:
+    int quickSelect(vector<int>& a, int l, int r, int index) {
+        int q = randomPartition(a, l, r);
+        if (q == index) {
+            return a[q];
+        } else {
+            return q < index ? quickSelect(a, q + 1, r, index) : quickSelect(a, l, q - 1, index);
+        }
+    }
+
+    inline int randomPartition(vector<int>& a, int l, int r) {
+        int i = rand() % (r - l + 1) + l;
+        swap(a[i], a[r]);
+        return partition(a, l, r);
+    }
+
+    inline int partition(vector<int>& a, int l, int r) {
+        int x = a[r], i = l - 1;
+        for (int j = l; j < r; ++j) {
+            if (a[j] <= x) {
+                swap(a[++i], a[j]);
+            }
+        }
+        swap(a[i + 1], a[r]);
+        return i + 1;
+    }
+
+    int findKthLargest(vector<int>& nums, int k) {
+        srand(time(0));
+        return quickSelect(nums, 0, nums.size() - 1, nums.size() - k);
+    }
+};
+```
+
+#### [75. 颜色分类!](https://leetcode-cn.com/problems/sort-colors/)
+
+荷兰国旗算法，设置三个指针，左指针（初始化-1）、右指针（初始化`lenth`）、当前遍历位置
+
+当前遍历位置和右指针不相等时一直执行如下循环
+
+* 若为0，则与左指针后一个位置交换，当前指针和左指针自增；
+* 若为1，当前指针自增；
+* 若为2，则与右指针前一个位置交换，右指针自减，当前指针不变。
+
+```C++
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        int lenth=nums.size(), left=-1, right=lenth, cur=0;
+        while(cur != right)
+        {
+            if(nums[cur] == 0)
+            {
+                swap(nums[++left], nums[cur]);
+                cur++;
+            }
+            else if(nums[cur] == 1)
+                cur++;
+            else
+                swap(nums[--right], nums[cur]);
+        }
+    }
+};
+```
+
+#### [324. 摆动排序 II(*)](https://leetcode-cn.com/problems/wiggle-sort-ii/)
+
+```C++
+class Solution {
+public:
+    void wiggleSort(vector<int>& nums) {
+        int n = nums.size();
+        // Find a median.
+        auto midptr = nums.begin() + n / 2;
+        nth_element(nums.begin(), midptr, nums.end());
+        int mid = *midptr;
+        // Index-rewiring.
+        #define A(i) nums[(1+2*(i)) % (n|1)]
+        // 3-way-partition-to-wiggly in O(n) time with O(1) space.
+        int i = 0, j = 0, k = n - 1;
+        while (j <= k) {
+            if (A(j) > mid)
+                swap(A(i++), A(j++));
+            else if (A(j) < mid)
+                swap(A(j), A(k--));
+            else
+                j++;
+        }
+    }
+};
+```
+
+#### [517. 超级洗衣机(*)](https://leetcode-cn.com/problems/super-washing-machines/)
+
+```C++
+class Solution {
+public:
+    int findMinMoves(vector<int> &machines) {
+        int tot = accumulate(machines.begin(), machines.end(), 0);
+        int n = machines.size();
+        if (tot % n) {
+            return -1;
+        }
+        int avg = tot / n;
+        int ans = 0, sum = 0;
+        for (int num: machines) {
+            num -= avg;
+            sum += num;
+            ans = max(ans, max(abs(sum), num));
+        }
+        return ans;
+    }
+};
+```
+
