@@ -36,16 +36,23 @@
 链接：https://leetcode-cn.com/problems/longest-uncommon-subsequence-i
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 */
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <iostream>
 #include <map>
+#include <string.h>
+#include <vector>
 using namespace std;
-
-// code
-
-int main()
-{
-    Solution S;
-    return 0;
-}
+class Solution {
+public:
+    int findLUSlength(string a, string b)
+    {
+        // method 1
+        if (strcmp(a.c_str(), b.c_str()) == 0) {
+            return -1;
+        } else {
+            return max(a.size(), b.size());
+        }
+        // method 2
+        return strcmp(a.c_str(), b.c_str()) == 0 ? -1 : max(a.size(), b.size());
+    }
+};
