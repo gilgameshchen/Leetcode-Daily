@@ -527,3 +527,248 @@ public:
 };
 ```
 
+#### [649. Dota2 参议院(*)](https://leetcode-cn.com/problems/dota2-senate/)
+
+贪心算法，优先禁言下一个不同阵营的议员，因此需要两个队列
+
+```C++
+class Solution {
+public:
+    string predictPartyVictory(string senate) {
+        int n = senate.size();
+        queue<int> radiant, dire;
+        for (int i = 0; i < n; ++i) {
+            if (senate[i] == 'R') {
+                radiant.push(i);
+            }
+            else {
+                dire.push(i);
+            }
+        }
+        while (!radiant.empty() && !dire.empty()) {
+            if (radiant.front() < dire.front()) {
+                radiant.push(radiant.front() + n);
+            }
+            else {
+                dire.push(dire.front() + n);
+            }
+            radiant.pop();
+            dire.pop();
+        }
+        return !radiant.empty() ? "Radiant" : "Dire";
+    }
+};
+```
+
+#### [678. 有效的括号字符串](https://leetcode-cn.com/problems/valid-parenthesis-string/)
+
+使用栈，设置左括号和星号栈。当遇到右括号时，优先弹出左括号栈，其次弹出星号栈。
+
+若遍历一轮之后，左括号栈不为空，则检查左括号栈顶元素是否小于星号栈顶元素（即星号在左括号后面）
+
+```C++
+class Solution {
+public:
+    bool checkValidString(string s) {
+        stack<int> left, star;
+        int lenth=s.size();
+        for(int i=0; i<lenth; i++)
+        {
+            if(s[i] == '(')
+                left.push(i);
+            else if(s[i] == '*')
+                star.push(i);
+            else
+            {
+                if(!left.empty())
+                    left.pop();
+                else if(!star.empty())
+                    star.pop();
+                else
+                    return false;
+            }
+        }
+        while(!left.empty())
+        {
+            if(star.empty())
+                return false;
+            else if(star.top() < left.top())
+                return false;
+            else
+            {
+                star.pop();
+                left.pop();
+            }
+        }
+        return true;
+    }
+};
+```
+
+#### [420. 强密码检验器(*)](https://leetcode-cn.com/problems/strong-password-checker/)
+
+```C++
+class Solution {
+
+public:
+    int strongPasswordChecker(string str) {
+        // 统计小写字符
+        int lowerCase = 0;
+        // 统计大写字符
+        int upwerCase = 0;
+        // 统计数字
+        int number = 0;
+        
+        // 统计连续字符出现的位置
+        vector<array<int,2>>sameChars;
+
+        if (str.length() == 0) {
+            return 6;
+        }
+        // 记露连续出现的字符
+        int st=-1;
+        int en=-1;
+        char pre='\0';
+
+        for (int i = 0; i < str.length(); i++) {
+            if (str[i] >= 'a' && str[i] <= 'z') {
+                lowerCase++;
+            } else if (str[i] >= 'A' && str[i] <= 'Z') {
+                upwerCase++;
+            } else if (str[i] >= '0' && str[i] <= '9') {
+                number++;
+            }
+            if (pre != str[i]) {
+                if (en - st >= 2) {
+                    sameChars.push_back({st,en});
+                }
+                pre = str[i];
+                st = i;
+                en = i;
+            } else {
+                en = i;
+            }
+        }
+        if (en - st >= 2) {
+            sameChars.push_back({st, en});
+        }
+      
+        // 缺失的类型. 只可能是1 or 2
+        int needType = count0(lowerCase, upwerCase, number);
+        // 连续的字符出现的要消除的个数 连续值-2
+        vector<int>chages(sameChars.size());
+
+        for (int j = 0; j < sameChars.size(); j++) {
+            chages[j] = sameChars[j][1] - sameChars[j][0] - 1;
+        }
+        int res = 0;
+        // 如果长度小于6 , 很简单 要补的字符和缺失的类型择大
+        if (str.length() < 6) {
+            return max((int)(6 - str.length()), needType);
+        }
+        // 删除的时候 要有优先概念
+        if (str.length() > 20) {
+            int index = -1;
+            while (needType > 0 && (index = find(chages, 0)) > -1) {
+                chages[index] = max(chages[index] - 3, 0);
+                
+                res++;
+                
+                needType--;
+                //cout<<index<<" "<<chages[index]<<" "<<res<<" "<<needType<<endl;
+            }
+            int d = str.length() - 20;
+            while (d > 0 && (index = find(chages, 1)) > -1) {
+                d--;
+                res++;
+                chages[index]--;
+            }
+            int n = 0;
+            for (int l = 0; l < chages.size(); l++) {
+                n += chages[l] % 3 == 0 ? chages[l] / 3 : chages[l] / 3 + 1;
+            }
+            return res + d + needType + n;
+        }
+        int n = 0;
+        for (int l = 0; l < chages.size(); l++) {
+            n += chages[l] % 3 == 0 ? chages[l] / 3 : chages[l] / 3 + 1;
+        }
+        return max(n, needType);
+    }
+
+    int count0(int a,int b,int c) {
+        int n = 0;
+        if(a==0)n++;
+        if(b==0)n++;
+        if(c==0)n++;
+        return n;
+    }
+
+    int find(vector<int>& array, int n) {
+        int n0 = -1;
+        int n1 = -1;
+        int n2 = -1;
+        for (int i = 0; i < array.size(); i++) {
+            if (array[i] > 0 && array[i] % 3 == 0) {
+                if(n0!=-1&&array[i]>array[n0]){
+                    n0 = i;
+                }
+                if(n0==-1){
+                    n0=i;
+                }
+                
+            }
+            if (array[i] > 0 && array[i] % 3 == 1) {
+                if(n1!=-1&&array[i]>array[n1]){
+                    n1 = i;
+                }
+                if(n1==-1){
+                    n1=i;
+                }
+            }
+            if (array[i] > 0 && array[i] % 3 == 2) {
+                if(n2!=-1&&array[i]>array[n2]){
+                    n2 = i;
+                }
+                
+                if(n2==-1){
+                    n2=i;
+                }
+            }
+        }
+        if (n == 0) {
+            return n0 > -1 ? n0 : (n2 > -1 ? n2 : n1);
+        }
+        if (n == 1) {
+            return n1 > -1 ? n1 : (n2 > -1 ? n2 : n0);
+        }
+        return -1;
+    }
+};
+```
+
+#### [53. 最大子数组和](https://leetcode-cn.com/problems/maximum-subarray/)
+
+* 法一，动态规划
+
+	![image-20220126120455839](README.assets/image-20220126120455839.png)
+
+* 法二，分治法
+
+	![image-20220126120732346](README.assets/image-20220126120732346.png)![image-20220126120738207](README.assets/image-20220126120738207.png)
+
+```C++
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int presum=0, result=nums[0], lenth=nums.size();
+        for(auto n:nums)
+        {
+            presum = (presum < 0) ? n : presum + n;
+            result = (result > presum) ? result : presum;
+        }
+        return result;
+    }
+};
+```
+
