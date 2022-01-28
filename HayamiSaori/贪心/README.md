@@ -772,3 +772,85 @@ public:
 };
 ```
 
+#### [134. 加油站(*)](https://leetcode-cn.com/problems/gas-station/)
+
+从头到尾遍历每个加油站，并检查以该加油站为起点，最终能否行驶一周。我们可以通过减小被检查的加油站数目，来降低总的时间复杂度
+
+```C++
+class Solution {
+public:
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+        int n = gas.size();
+        int i = 0;
+        while (i < n) {
+            int sumOfGas = 0, sumOfCost = 0;
+            int cnt = 0;
+            while (cnt < n) {
+                int j = (i + cnt) % n;
+                sumOfGas += gas[j];
+                sumOfCost += cost[j];
+                if (sumOfCost > sumOfGas) {
+                    break;
+                }
+                cnt++;
+            }
+            if (cnt == n) {
+                return i;
+            } else {
+                i = i + cnt + 1;
+            }
+        }
+        return -1;
+    }
+};
+```
+
+#### [581. 最短无序连续子数组(*)](https://leetcode-cn.com/problems/shortest-unsorted-continuous-subarray/)
+
+从左到右遍历，记录当前最大值`max`，若`nums[i] < max`，说明位置`i`需要调整，记录需要调整的最大`i`为`high`
+
+从右到左遍历，记录当前最小值`min`，若`nums[i] > min`，说明位置`i`需要调整，记录需要调整的最小`i`为`low`
+
+```C++
+class Solution {
+public:
+    int findUnsortedSubarray(vector<int>& nums) {
+        int temp=nums[0], lenth=nums.size(), high=0, low=lenth-1;
+        for(int i=0; i<lenth; i++)
+        {
+            if(temp <= nums[i])
+                temp = nums[i];
+            else
+                high = i;
+        }
+        temp = nums[lenth-1];
+        for(int i=lenth-1; i>=0; i--)
+        {
+            if(temp >= nums[i])
+                temp = nums[i];
+            else
+                low = i;
+        }
+        return (high > low) ? high - low + 1 : 0;  
+    }
+};
+```
+
+#### [152. 乘积最大子数组(*)](https://leetcode-cn.com/problems/maximum-product-subarray/)
+
+```C++
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        int maxF = nums[0], minF = nums[0], ans = nums[0];
+        for (int i = 1; i < nums.size(); ++i) {
+            int mx = maxF, mn = minF;
+            maxF = max(mx * nums[i], max(nums[i], mn * nums[i]));
+            minF = min(mn * nums[i], min(nums[i], mx * nums[i]));
+            ans = max(maxF, ans);
+        }
+        return ans;
+    }
+};
+```
+
