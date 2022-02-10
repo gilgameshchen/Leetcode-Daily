@@ -1003,3 +1003,64 @@ public:
 };
 ```
 
+#### [456. 132 模式(*)](https://leetcode-cn.com/problems/132-pattern/)
+
+```C++
+class Solution {
+public:
+    bool find132pattern(vector<int>& nums) {
+        int n = nums.size();
+        stack<int> candidate_k;
+        candidate_k.push(nums[n - 1]);
+        int max_k = INT_MIN;
+
+        for (int i = n - 2; i >= 0; --i) {
+            if (nums[i] < max_k) {
+                return true;
+            }
+            while (!candidate_k.empty() && nums[i] > candidate_k.top()) {
+                max_k = candidate_k.top();
+                candidate_k.pop();
+            }
+            if (nums[i] > max_k) {
+                candidate_k.push(nums[i]);
+            }
+        }
+
+        return false;
+    }
+};
+```
+
+#### [316. 去除重复字母(*)](https://leetcode-cn.com/problems/remove-duplicate-letters/)
+
+```C++
+class Solution {
+public:
+    string removeDuplicateLetters(string s) {
+        vector<int> vis(26), num(26);
+        for (char ch : s) {
+            num[ch - 'a']++;
+        }
+
+        string stk;
+        for (char ch : s) {
+            if (!vis[ch - 'a']) {
+                while (!stk.empty() && stk.back() > ch) {
+                    if (num[stk.back() - 'a'] > 0) {
+                        vis[stk.back() - 'a'] = 0;
+                        stk.pop_back();
+                    } else {
+                        break;
+                    }
+                }
+                vis[ch - 'a'] = 1;
+                stk.push_back(ch);
+            }
+            num[ch - 'a'] -= 1;
+        }
+        return stk;
+    }
+};
+```
+
